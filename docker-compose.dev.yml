@@ -1,0 +1,11 @@
+services:
+  backend:
+    build:
+      context: ./SampleApi
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8008:5025"
+    environment:
+      DATA_PATH: /data
+    volumes:
+      - ./SampleApi/.data:/data

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "h1",
+    "name": "John Steel",
+    "alias": "Ironclad",
+    "origin": "Enhanced soldier experiment",
+    "powerIds": ["p1"]
+  },
+  {
+    "id": "h2",
+    "name": "Maya Rivers",
+    "alias": "Mindwave",
+    "origin": "Cosmic radiation exposure",
+    "powerIds": ["p2"]
+  },
+  {
+    "id": "h3",
+    "name": "Ember Cross",
+    "alias": "Blaze",
+    "origin": "Volcanic eruption survivor",
+    "powerIds": ["p3", "p1"]
+  }
+]

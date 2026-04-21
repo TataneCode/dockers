@@ -1,0 +1,15 @@
+FROM almalinux:9
+
+RUN dnf install -y https://packages.microsoft.com/config/rhel/9/packages-microsoft-prod.rpm \
+    && dnf install -y dotnet-sdk-10.0 \
+    && dnf clean all
+
+WORKDIR /app
+COPY . .
+
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:5025
+
+EXPOSE 5025
+
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "SampleApi.csproj", "--no-hot-reload"]

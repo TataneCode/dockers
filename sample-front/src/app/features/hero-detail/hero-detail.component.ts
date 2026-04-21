@@ -1,0 +1,75 @@
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HeroStore } from '../../stores/hero.store';
+import { PowerStore } from '../../stores/power.store';
+
+@Component({
+  selector: 'app-hero-detail',
+  imports: [RouterLink],
+  template: `
+    <div class="page">
+      <a routerLink="/heroes" class="btn btn-sm back-link">← Back</a>
+
+      @if (store.loading()) {
+        <p class="loading">Loading…</p>
+      } @else if (store.selectedHero(); as hero) {
+        <div class="detail-header">
+          <h1>{{ hero.alias }}</h1>
+          <span class="text-muted">{{ hero.name }}</span>
+        </div>
+
+        <section class="detail-section">
+          <p><strong>Origin:</strong> {{ hero.origin }}</p>
+        </section>
+
+        <section class="detail-section">
+          <h2>Powers</h2>
+          @if (hero.powerIds.length > 0) {
+            <ul class="card-list">
+              @for (id of hero.powerIds; track id) {
+                @if (getPower(id); as power) {
+                  <li class="card">
+                    <div class="card-body">
+                      <strong>{{ power.name }}</strong>
+                      <span class="badge">{{ power.type }}</span>
+                      <span class="text-muted">Level {{ power.level }}</span>
+                    </div>
+                    <div class="card-actions">
+                      <a [routerLink]="['/powers', id, 'edit']" class="btn btn-sm btn-secondary">Edit Power</a>
+                    </div>
+                  </li>
+                }
+              }
+            </ul>
+          } @else {
+            <p>No powers assigned.</p>
+          }
+        </section>
+
+        <div class="detail-footer">
+          <a [routerLink]="['/heroes', hero.id, 'edit']" class="btn btn-primary">Edit Hero</a>
+        </div>
+      } @else {
+        <p>Hero not found.</p>
+      }
+    </div>
+  `,
+})
+export class HeroDetailComponent implements OnInit, OnDestroy {
+  readonly store = inject(HeroStore);
+  readonly powerStore = inject(PowerStore);
+  private readonly heroId = inject(ActivatedRoute).snapshot.paramMap.get('id')!;
+
+  ngOnInit() {
+    this.store.loadOne(this.heroId);
+    this.powerStore.loadAll();
+  }
+
+  ngOnDestroy() {
+    this.store.clearSelected();
+  }
+
+  getPower(id: string) {
+    return this.powerStore.powers().find(p => p.id === id);
+  }
+}

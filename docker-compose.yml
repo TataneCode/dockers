@@ -1,0 +1,44 @@
+services:
+  traefik:
+    image: traefik:v3
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:4208"
+    ports:
+      - "4208:4208"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app
+
+  backend:
+    build:
+      context: ./SampleApi
+      dockerfile: Dockerfile
+    environment:
+      DATA_PATH: /app/.data
+    networks:
+      - app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.priority=10"
+      - "traefik.http.services.backend.loadbalancer.server.port=5025"
+
+  frontend:
+    build:
+      context: ./sample-front
+      dockerfile: Dockerfile
+    networks:
+      - app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+networks:
+  app:
