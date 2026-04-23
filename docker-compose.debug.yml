@@ -1,0 +1,12 @@
+services:
+  backend:
+    build:
+      context: ./SampleApi
+      dockerfile: Dockerfile.debug
+    container_name: sampleapi-debug
+    ports:
+      - "5025:5025"
+    environment:
+      DATA_PATH: /data
+    volumes:
+      - ./SampleApi/.data:/data

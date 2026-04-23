@@ -49,10 +49,23 @@ Scalar UI: `http://localhost:5025/scalar/v1`
 ```bash
 cd sample-front
 npm install
-npm start
+npm start        # proxies /api/* to http://localhost:5025 (local dotnet backend)
 ```
 
 App available at `http://localhost:4200`
+
+---
+
+## VSCode launch configurations
+
+Four configurations are available in `.vscode/launch.json`:
+
+| Name | What it does |
+|---|---|
+| **Backend (dotnet)** | Builds and runs the API in debug mode via the dotnet CLI |
+| **Frontend (npm)** | Runs `npm start` in `sample-front/` (proxies `/api/*` → `:5025`) |
+| **Full Stack** | Compound — starts both above simultaneously |
+| **Backend (Docker debug)** | Starts the debug Docker container and attaches vsdbg for remote debugging |
 
 ---
 
@@ -83,9 +96,9 @@ Runs the backend in Docker with hot-reload (`dotnet watch`). The `.data/` JSON f
 # Terminal 1 — start backend container
 docker compose -f docker-compose.dev.yml up --build
 
-# Terminal 2 — start Angular dev server on host
+# Terminal 2 — start Angular dev server on host (proxies /api/* to port 8008)
 cd sample-front
-npm start
+npm run start:docker
 ```
 
 - Backend API: `http://localhost:8008`

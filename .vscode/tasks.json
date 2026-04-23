@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-backend",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/SampleApi/SampleApi.csproj"],
+      "problemMatcher": "$msCompile",
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+    {
+      "type": "docker-build",
+      "label": "docker-build: debug",
+      "dockerBuild": {
+        "tag": "sampleapi:debug",
+        "context": "${workspaceFolder}/SampleApi",
+        "dockerfile": "${workspaceFolder}/SampleApi/Dockerfile.debug"
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: debug",
+      "dependsOn": ["docker-build: debug"],
+      "dockerRun": {
+        "containerName": "sampleapi-debug",
+        "image": "sampleapi:debug",
+        "env": {
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "DATA_PATH": "/data"
+        },
+        "ports": [{ "containerPort": 5025, "hostPort": 5025 }],
+        "volumes": [
+          {
+            "localPath": "${workspaceFolder}/SampleApi/.data",
+            "containerPath": "/data"
+          }
+        ],
+        "remove": false
+      },
+      "netCore": {
+        "appProject": "${workspaceFolder}/SampleApi/SampleApi.csproj",
+        "enableDebugging": true
+      }
+    }
+  ]
+}

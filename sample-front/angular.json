@@ -73,7 +73,8 @@
               "buildTarget": "sample-front:build:production"
             },
             "development": {
-              "buildTarget": "sample-front:build:development"
+              "buildTarget": "sample-front:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
@@ -104,5 +105,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "deef6f53-53e1-4a44-b524-1cf0442986bb"
   }
 }
