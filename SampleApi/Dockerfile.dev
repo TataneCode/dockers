@@ -4,7 +4,7 @@ RUN dnf install -y https://packages.microsoft.com/config/rhel/9/packages-microso
     && dnf install -y dotnet-sdk-10.0 \
     && dnf clean all
 
-WORKDIR /app
+WORKDIR /src
 COPY . .
 
 ENV ASPNETCORE_ENVIRONMENT=Development
@@ -12,4 +12,4 @@ ENV ASPNETCORE_URLS=http://+:5025
 
 EXPOSE 5025
 
-ENTRYPOINT ["dotnet", "watch", "run", "--project", "SampleApi.csproj", "--no-hot-reload"]
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "SampleApi/SampleApi.csproj", "--no-hot-reload"]

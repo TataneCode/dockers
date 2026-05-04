@@ -2,6 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Backend (Nest)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run start:dev",
+      "cwd": "${workspaceFolder}/NestApi"
+    },
+    {
       "name": "Backend (dotnet)",
       "type": "coreclr",
       "request": "launch",
@@ -33,6 +40,20 @@
       }
     },
     {
+      "name": "Frontend (npm - SampleApi)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:sampleapi"],
+      "cwd": "${workspaceFolder}/sample-front",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "Local:\\s+(http://\\S+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    },
+    {
       "name": "Backend (Docker debug)",
       "type": "docker",
       "request": "launch",
@@ -49,7 +70,11 @@
   "compounds": [
     {
       "name": "Full Stack",
-      "configurations": ["Backend (dotnet)", "Frontend (npm)"]
+      "configurations": ["Backend (Nest)", "Frontend (npm)"]
+    },
+    {
+      "name": "Full Stack (.NET)",
+      "configurations": ["Backend (dotnet)", "Frontend (npm - SampleApi)"]
     }
   ]
 }

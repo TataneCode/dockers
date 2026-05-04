@@ -1,7 +1,6 @@
 using SampleApi.Endpoints;
-using SampleApi.Models;
-using SampleApi.Records;
-using SampleApi.Services;
+using SampleApi.Application.Services;
+using SampleApi.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,18 +13,19 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod()));
 
-var dataPath = Environment.GetEnvironmentVariable("DATA_PATH")
-    ?? Path.Combine(AppContext.BaseDirectory, ".data");
-builder.Services.AddSingleton(_ => new JsonRepository<Hero>(Path.Combine(dataPath, "heroes.json")));
-builder.Services.AddSingleton(_ => new JsonRepository<Power>(Path.Combine(dataPath, "powers.json")));
-builder.Services.AddSingleton<IEntityService<HeroRequest, HeroResponse>, HeroService>();
-builder.Services.AddSingleton<IEntityService<PowerRequest, PowerResponse>, PowerService>();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddScoped<IHeroService, HeroService>();
+builder.Services.AddScoped<IPowerService, PowerService>();
 
 var app = builder.Build();
 
 app.UseCors();
-app.MapOpenApi();
-app.MapScalarApiReference();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.MapHeroEndpoints();
 app.MapPowerEndpoints();

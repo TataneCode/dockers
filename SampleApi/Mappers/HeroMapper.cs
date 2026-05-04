@@ -1,27 +1,14 @@
-using SampleApi.Models;
-using SampleApi.Records;
+using SampleApi.Domain.Models;
+using SampleApi.Requests;
+using SampleApi.Responses;
 
 namespace SampleApi.Mappers;
 
 public static class HeroMapper
 {
-    public static HeroResponse ToResponse(Hero hero) =>
-        new(hero.Id, hero.Name, hero.Alias, hero.Origin, hero.PowerIds);
+    public static HeroResponse ToResponse(HeroModel hero) =>
+        new(hero.Id, hero.Name, hero.Alias, hero.Origin, hero.PowerIds.ToList());
 
-    public static Hero ToModel(HeroRequest request) => new()
-    {
-        Id = Guid.NewGuid().ToString(),
-        Name = request.Name,
-        Alias = request.Alias,
-        Origin = request.Origin,
-        PowerIds = request.PowerIds
-    };
-
-    public static void Apply(HeroRequest request, Hero hero)
-    {
-        hero.Name = request.Name;
-        hero.Alias = request.Alias;
-        hero.Origin = request.Origin;
-        hero.PowerIds = request.PowerIds;
-    }
+    public static HeroModel ToModel(HeroRequest request) =>
+        new(string.Empty, request.Name, request.Alias, request.Origin, request.PowerIds ?? []);
 }

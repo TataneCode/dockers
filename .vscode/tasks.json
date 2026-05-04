@@ -2,6 +2,19 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "build-nest-backend",
+      "type": "process",
+      "command": "npm",
+      "args": ["run", "build"],
+      "options": {
+        "cwd": "${workspaceFolder}/NestApi"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+    {
       "label": "build-backend",
       "type": "process",
       "command": "dotnet",

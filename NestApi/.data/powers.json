@@ -1,0 +1,30 @@
+[
+  {
+    "id": "p1",
+    "name": "Super Strength",
+    "description": "Ability to exert greater-than-normal physical force",
+    "type": "Physical",
+    "level": 8
+  },
+  {
+    "id": "p2",
+    "name": "Telepathy",
+    "description": "Ability to read and transmit thoughts across vast distances",
+    "type": "Mental",
+    "level": 9
+  },
+  {
+    "id": "p3",
+    "name": "Pyrokinesis",
+    "description": "Ability to create, control, and absorb fire",
+    "type": "Elemental",
+    "level": 7
+  },
+  {
+    "id": "p4",
+    "name": "Tech Mastery",
+    "description": "Ability to interface with and control any technology",
+    "type": "Tech",
+    "level": 8
+  }
+]

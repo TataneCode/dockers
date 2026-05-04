@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Hero {
+  id         String     @id @db.VarChar(64)
+  name       String     @db.VarChar(200)
+  alias      String     @db.VarChar(200)
+  origin     String     @db.VarChar(300)
+  heroPowers HeroPower[]
+
+  @@map("heroes")
+}
+
+model Power {
+  id          String      @id @db.VarChar(64)
+  name        String      @db.VarChar(200)
+  description String      @db.VarChar(500)
+  type        String      @db.VarChar(100)
+  level       Int
+  heroPowers  HeroPower[]
+
+  @@map("powers")
+}
+
+model HeroPower {
+  heroId   String @db.VarChar(64)
+  powerId  String @db.VarChar(64)
+  position Int
+  hero     Hero   @relation(fields: [heroId], references: [id], onDelete: Cascade)
+  power    Power  @relation(fields: [powerId], references: [id], onDelete: Cascade)
+
+  @@id([heroId, powerId])
+  @@index([heroId, position])
+  @@index([powerId])
+  @@map("hero_powers")
+}

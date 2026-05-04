@@ -1,0 +1,2 @@
+export const HERO_REPOSITORY = Symbol('HERO_REPOSITORY');
+export const POWER_REPOSITORY = Symbol('POWER_REPOSITORY');

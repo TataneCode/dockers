@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" Version="2.14.1" />
   </ItemGroup>
 
@@ -15,6 +19,12 @@
     <Content Include=".data/*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SampleApi.Application\SampleApi.Application.csproj" />
+    <ProjectReference Include="..\SampleApi.Infrastructure\SampleApi.Infrastructure.csproj" />
+    <ProjectReference Include="..\SampleApi.Domain\SampleApi.Domain.csproj" />
   </ItemGroup>
 
 </Project>

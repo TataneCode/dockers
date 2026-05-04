@@ -1,4 +1,21 @@
 services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
   traefik:
     image: traefik:v3
     command:
@@ -14,18 +31,25 @@ services:
 
   backend:
     build:
-      context: ./SampleApi
+      context: ./NestApi
       dockerfile: Dockerfile
     environment:
-      DATA_PATH: /app/.data
+      PORT: 3000
+      DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/nest_api
+      JSON_SEED_DATA_PATH: /app/.data
+    volumes:
+      - nest-data:/app/.data
     networks:
       - app
+    depends_on:
+      mysql:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/openapi`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.routers.backend.priority=10"
-      - "traefik.http.services.backend.loadbalancer.server.port=5025"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
 
   frontend:
     build:
@@ -42,3 +66,7 @@ services:
 
 networks:
   app:
+
+volumes:
+  mysql-data:
+  nest-data:

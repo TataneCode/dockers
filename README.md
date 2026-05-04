@@ -1,78 +1,23 @@
 # Heroes & Powers
 
-A full-stack sample application built with **.NET 10 Minimal API** and **Angular 19**.
-
-## Features
-
-- **Heroes** — CRUD for superhero profiles with real name, alias, origin, and linked powers
-- **Powers** — CRUD for power definitions (name, description, type, level)
-- **Signal Store** — reactive state via `@ngrx/signals`
-- **Reactive forms** — type-safe Angular forms
-- **JSON file storage** — data persisted in `.data/*.json` (no database required)
-
----
+Full-stack sample application with an **Angular 19** frontend, a **NestJS 11** backend in `NestApi/`, and the original **.NET 10 Minimal API** kept in `SampleApi/` as the reference implementation.
 
 ## Project structure
 
-```
+```text
 .
-├── SampleApi/           .NET 10 Minimal API backend
-│   ├── .data/           heroes.json, powers.json (seed data)
-│   ├── Models/          IEntity, Hero, Power
-│   ├── Records/         HeroRequest/Response, PowerRequest/Response
-│   ├── Mappers/         HeroMapper, PowerMapper
-│   ├── Services/        IEntityService, JsonRepository, EntityService, HeroService, PowerService
-│   └── Endpoints/       HeroEndpoints, PowerEndpoints
-└── sample-front/        Angular 19 standalone app
-    └── src/app/
-        ├── core/        models + API services
-        ├── stores/      HeroStore, PowerStore (@ngrx/signals)
-        └── features/    heroes, hero-detail, hero-form, power-form
+├── NestApi/        NestJS 11 backend (default backend target)
+├── SampleApi/      .NET 10 Minimal API reference backend
+├── sample-front/   Angular standalone frontend
+└── .vscode/        Workspace launch/tasks for Nest, Angular, and SampleApi
 ```
 
----
+## What the Nest backend reproduces
 
-## Getting started
-
-### Backend
-
-```bash
-dotnet run --project SampleApi
-```
-
-API available at `http://localhost:5025`  
-OpenAPI spec: `http://localhost:5025/openapi/v1.json`  
-Scalar UI: `http://localhost:5025/scalar/v1`
-
-### Frontend
-
-```bash
-cd sample-front
-npm install
-npm start        # proxies /api/* to http://localhost:5025 (local dotnet backend)
-```
-
-App available at `http://localhost:4200`
-
----
-
-## VSCode launch configurations
-
-Four configurations are available in `.vscode/launch.json`:
-
-| Name | What it does |
-|---|---|
-| **Backend (dotnet)** | Builds and runs the API in debug mode via the dotnet CLI |
-| **Frontend (npm)** | Runs `npm start` in `sample-front/` (proxies `/api/*` → `:5025`) |
-| **Full Stack** | Compound — starts both above simultaneously |
-| **Backend (Docker debug)** | Starts the debug Docker container and attaches vsdbg for remote debugging |
-
----
-
-## API routes
+`NestApi/` mirrors the current `.NET` API contract used by the frontend:
 
 | Method | Route | Description |
-|--------|-------|-------------|
+| --- | --- | --- |
 | GET | `/api/heroes` | List all heroes |
 | GET | `/api/heroes/{id}` | Get hero by id |
 | POST | `/api/heroes` | Create hero |
@@ -84,38 +29,131 @@ Four configurations are available in `.vscode/launch.json`:
 | PUT | `/api/powers/{id}` | Update power |
 | DELETE | `/api/powers/{id}` | Delete power |
 
----
+The legacy JSON files still live in `NestApi/.data/heroes.json` and `NestApi/.data/powers.json`, but the Nest backend now targets MySQL through Prisma.
 
-## Docker
+## How NestApi was created
 
-### Development mode (port 8008)
-
-Runs the backend in Docker with hot-reload (`dotnet watch`). The `.data/` JSON files are mounted from the host so data persists across container restarts. The frontend runs on the host.
+The backend was scaffolded with the Nest CLI and then extended to match the existing `.NET` sample:
 
 ```bash
-# Terminal 1 — start backend container
-docker compose -f docker-compose.dev.yml up --build
-
-# Terminal 2 — start Angular dev server on host (proxies /api/* to port 8008)
-cd sample-front
-npm run start:docker
+npx @nestjs/cli@latest new NestApi --package-manager npm --skip-git --strict
+cd NestApi
+npm install @nestjs/swagger swagger-ui-express class-validator class-transformer
 ```
 
-- Backend API: `http://localhost:8008`
-- Frontend: `http://localhost:4200`
-- OpenAPI / Scalar UI: `http://localhost:8008/scalar/v1`
+The generated starter was then replaced with:
 
-### Release mode (port 4208)
+1. `heroes` and `powers` modules for the CRUD endpoints
+2. A shared JSON-file storage service
+3. OpenAPI/Swagger setup plus CORS for the Angular app
+4. Docker packaging and root workspace wiring
 
-Builds both backend and frontend images. Traefik routes `/api/*` to the backend and all other traffic to the Angular nginx container.
+## Run locally without Docker
+
+### 1. Start the Nest backend
+
+```bash
+docker compose up -d mysql
+cd NestApi
+npm install
+npm run prisma:migrate:deploy
+npm run start:dev
+```
+
+Available URLs:
+
+- API: `http://localhost:3000`
+- Swagger UI: `http://localhost:3000/docs`
+- OpenAPI JSON: `http://localhost:3000/openapi/v1.json`
+
+### 2. Start the Angular frontend
+
+```bash
+cd sample-front
+npm install
+npm start
+```
+
+The Angular dev server runs on `http://localhost:4200` and now proxies `/api/*` to `http://localhost:3000`.
+
+## Run from VS Code
+
+Root `.vscode/launch.json` now provides:
+
+| Name | What it does |
+| --- | --- |
+| **Backend (Nest)** | Starts the Nest backend in watch mode |
+| **Frontend (npm)** | Starts Angular against the Nest backend |
+| **Full Stack** | Starts Nest + Angular together |
+| **Backend (dotnet)** | Starts the original `.NET` backend |
+| **Frontend (npm - SampleApi)** | Starts Angular against the `.NET` backend |
+| **Full Stack (.NET)** | Starts `.NET` + Angular together |
+| **Backend (Docker debug)** | Keeps the existing Docker debug flow for `SampleApi` |
+
+## Run with Docker Compose
+
+From the repository root:
 
 ```bash
 docker compose up --build
 ```
 
+This starts:
+
+- Traefik on `http://localhost:4208`
+- Angular frontend behind Traefik
+- Nest backend behind Traefik
+- A shared MySQL instance with `sample_api` and `nest_api` schemas
+
+Available URLs:
+
 - App: `http://localhost:4208`
-- API: `http://localhost:4208/api/heroes`
+- API example: `http://localhost:4208/api/heroes`
+- Swagger UI: `http://localhost:4208/docs`
+- OpenAPI JSON: `http://localhost:4208/openapi/v1.json`
 
-> **Note:** First build downloads AlmaLinux base images and installs packages — it may take a few minutes.
+The Nest backend applies Prisma migrations on startup. The legacy JSON directory is still mounted so it can be used as optional manual seed input by enabling `JSON_SEED_ENABLED=true`.
 
-# dockers
+## Validate the Nest backend
+
+From `NestApi/`:
+
+```bash
+npm run lint
+npm test -- --runInBand
+npm run test:e2e -- --runInBand
+npm run build
+```
+
+## Alternate .NET backend
+
+`SampleApi/` stays available as the reference implementation.
+
+### Run SampleApi directly
+
+```bash
+dotnet run --project SampleApi/SampleApi.csproj
+```
+
+It starts on `http://localhost:5025`, expects MySQL on `localhost:3306` with the `sample_api` schema, and applies the current EF Core migrations on startup.
+
+### Run Angular against SampleApi
+
+```bash
+cd sample-front
+npm run start:sampleapi
+```
+
+### Build SampleApi
+
+```bash
+dotnet build sample-back.slnx
+```
+
+### Run SampleApi with Docker Compose
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+This starts the `.NET` API on `http://localhost:8008` plus MySQL. Existing JSON files stay in `SampleApi/.data/` and can be used as optional manual seed input by enabling `JsonSeed__Enabled=true`.
