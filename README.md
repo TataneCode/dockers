@@ -1,23 +1,28 @@
 # Heroes & Powers
 
-Full-stack sample application with an **Angular 19** frontend, a **NestJS 11** backend in `NestApi/`, and the original **.NET 10 Minimal API** kept in `SampleApi/` as the reference implementation.
+Full-stack sample application with an **Angular 19** frontend and three backend implementations that expose the same Heroes & Powers REST API:
+
+| Directory | Stack | DB schema |
+|-----------|-------|-----------|
+| `NestApi/` | NestJS 11 + Prisma | `nest_api` |
+| `SampleApi/` | .NET 10 Minimal API + EF Core | `sample_api` |
+| `RustApi/` | Rust · Axum + SQLx | `rust_api` |
 
 ## Project structure
 
 ```text
 .
-├── NestApi/        NestJS 11 backend (default backend target)
-├── SampleApi/      .NET 10 Minimal API reference backend
-├── sample-front/   Angular standalone frontend
-└── .vscode/        Workspace launch/tasks for Nest, Angular, and SampleApi
+├── NestApi/        NestJS 11 backend
+├── SampleApi/      .NET 10 Minimal API backend
+├── RustApi/        Rust (Axum + SQLx) backend
+├── sample-front/   Angular 19 standalone frontend
+└── .vscode/        Workspace launch/tasks
 ```
 
-## What the Nest backend reproduces
-
-`NestApi/` mirrors the current `.NET` API contract used by the frontend:
+## API contract (identical across all backends)
 
 | Method | Route | Description |
-| --- | --- | --- |
+|--------|-------|-------------|
 | GET | `/api/heroes` | List all heroes |
 | GET | `/api/heroes/{id}` | Get hero by id |
 | POST | `/api/heroes` | Create hero |
@@ -29,28 +34,9 @@ Full-stack sample application with an **Angular 19** frontend, a **NestJS 11** b
 | PUT | `/api/powers/{id}` | Update power |
 | DELETE | `/api/powers/{id}` | Delete power |
 
-The legacy JSON files still live in `NestApi/.data/heroes.json` and `NestApi/.data/powers.json`, but the Nest backend now targets MySQL through Prisma.
-
-## How NestApi was created
-
-The backend was scaffolded with the Nest CLI and then extended to match the existing `.NET` sample:
-
-```bash
-npx @nestjs/cli@latest new NestApi --package-manager npm --skip-git --strict
-cd NestApi
-npm install @nestjs/swagger swagger-ui-express class-validator class-transformer
-```
-
-The generated starter was then replaced with:
-
-1. `heroes` and `powers` modules for the CRUD endpoints
-2. A shared JSON-file storage service
-3. OpenAPI/Swagger setup plus CORS for the Angular app
-4. Docker packaging and root workspace wiring
-
 ## Run locally without Docker
 
-### 1. Start the Nest backend
+### NestJS backend
 
 ```bash
 docker compose up -d mysql
@@ -60,13 +46,26 @@ npm run prisma:migrate:deploy
 npm run start:dev
 ```
 
-Available URLs:
-
 - API: `http://localhost:3000`
 - Swagger UI: `http://localhost:3000/docs`
 - OpenAPI JSON: `http://localhost:3000/openapi/v1.json`
 
-### 2. Start the Angular frontend
+### Rust backend
+
+```bash
+docker compose up -d mysql
+cd RustApi
+cp .env.example .env   # or edit DATABASE_URL / PORT directly
+cargo run
+```
+
+- API: `http://localhost:3001`
+- Scalar UI: `http://localhost:3001/scalar`
+- OpenAPI JSON: `http://localhost:3001/openapi.json`
+
+The Rust backend runs its own SQLx migrations on startup against the `rust_api` schema and optionally seeds data from `.data/powers.json` and `.data/heroes.json` when `JSON_SEED_ENABLED=true`.
+
+### Angular frontend
 
 ```bash
 cd sample-front
@@ -74,25 +73,23 @@ npm install
 npm start
 ```
 
-The Angular dev server runs on `http://localhost:4200` and now proxies `/api/*` to `http://localhost:3000`.
+The Angular dev server runs on `http://localhost:4200` and proxies `/api/*` to the active backend.
 
 ## Run from VS Code
 
-Root `.vscode/launch.json` now provides:
+Root `.vscode/launch.json` provides:
 
 | Name | What it does |
-| --- | --- |
+|------|-------------|
 | **Backend (Nest)** | Starts the Nest backend in watch mode |
 | **Frontend (npm)** | Starts Angular against the Nest backend |
 | **Full Stack** | Starts Nest + Angular together |
-| **Backend (dotnet)** | Starts the original `.NET` backend |
-| **Frontend (npm - SampleApi)** | Starts Angular against the `.NET` backend |
-| **Full Stack (.NET)** | Starts `.NET` + Angular together |
-| **Backend (Docker debug)** | Keeps the existing Docker debug flow for `SampleApi` |
+| **Backend (dotnet)** | Starts the .NET backend |
+| **Frontend (npm - SampleApi)** | Starts Angular against the .NET backend |
+| **Full Stack (.NET)** | Starts .NET + Angular together |
+| **Backend (Docker debug)** | Docker debug flow for SampleApi |
 
 ## Run with Docker Compose
-
-From the repository root:
 
 ```bash
 docker compose up --build
@@ -101,59 +98,58 @@ docker compose up --build
 This starts:
 
 - Traefik on `http://localhost:4208`
-- Angular frontend behind Traefik
-- Nest backend behind Traefik
-- A shared MySQL instance with `sample_api` and `nest_api` schemas
+- Angular frontend
+- NestJS backend (`nest_api` schema)
+- Rust backend (`rust_api` schema)
+- Shared MySQL instance
 
-Available URLs:
+| Service | URL via Traefik |
+|---------|----------------|
+| Angular frontend | `http://localhost:4208/` |
+| NestJS API | `http://localhost:4208/api/` |
+| NestJS Swagger | `http://localhost:4208/docs` |
+| Rust API | `http://localhost:4208/rust-api/api/` |
+| Rust Scalar UI | `http://localhost:4208/rust-api/scalar` |
 
-- App: `http://localhost:4208`
-- API example: `http://localhost:4208/api/heroes`
-- Swagger UI: `http://localhost:4208/docs`
-- OpenAPI JSON: `http://localhost:4208/openapi/v1.json`
+Each backend applies its own migrations on startup. TLS termination is handled by Traefik; all backends listen on plain HTTP internally.
 
-The Nest backend applies Prisma migrations on startup. The legacy JSON directory is still mounted so it can be used as optional manual seed input by enabling `JSON_SEED_ENABLED=true`.
+## Validate / build
 
-## Validate the Nest backend
-
-From `NestApi/`:
+### NestJS
 
 ```bash
+cd NestApi
 npm run lint
 npm test -- --runInBand
 npm run test:e2e -- --runInBand
 npm run build
 ```
 
-## Alternate .NET backend
-
-`SampleApi/` stays available as the reference implementation.
-
-### Run SampleApi directly
+### Rust
 
 ```bash
-dotnet run --project SampleApi/SampleApi.csproj
+cd RustApi
+cargo build
+cargo test
 ```
 
-It starts on `http://localhost:5025`, expects MySQL on `localhost:3306` with the `sample_api` schema, and applies the current EF Core migrations on startup.
-
-### Run Angular against SampleApi
-
-```bash
-cd sample-front
-npm run start:sampleapi
-```
-
-### Build SampleApi
+### .NET
 
 ```bash
 dotnet build sample-back.slnx
 ```
 
-### Run SampleApi with Docker Compose
+## Alternate .NET backend
+
+`SampleApi/` stays available as the reference implementation.
 
 ```bash
-docker compose -f docker-compose.dev.yml up --build
+dotnet run --project SampleApi/SampleApi.csproj
 ```
 
-This starts the `.NET` API on `http://localhost:8008` plus MySQL. Existing JSON files stay in `SampleApi/.data/` and can be used as optional manual seed input by enabling `JsonSeed__Enabled=true`.
+Starts on `http://localhost:5025`, schema `sample_api`, applies EF Core migrations on startup.
+
+```bash
+# Docker Compose (dev)
+docker compose -f docker-compose.dev.yml up --build
+```

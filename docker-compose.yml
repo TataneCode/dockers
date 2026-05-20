@@ -51,6 +51,30 @@ services:
       - "traefik.http.routers.backend.priority=10"
       - "traefik.http.services.backend.loadbalancer.server.port=3000"
 
+  rust-backend:
+    build:
+      context: ./RustApi
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/rust_api
+      JSON_SEED_ENABLED: "true"
+      JSON_SEED_DATA_PATH: /app/.data
+      RUST_LOG: rust_api=info
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rust-backend.rule=PathPrefix(`/rust-api`)"
+      - "traefik.http.routers.rust-backend.entrypoints=web"
+      - "traefik.http.routers.rust-backend.priority=10"
+      - "traefik.http.middlewares.rust-strip.stripprefix.prefixes=/rust-api"
+      - "traefik.http.routers.rust-backend.middlewares=rust-strip"
+      - "traefik.http.services.rust-backend.loadbalancer.server.port=3000"
+
   frontend:
     build:
       context: ./sample-front

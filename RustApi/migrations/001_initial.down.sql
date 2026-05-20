@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS hero_powers;
+DROP TABLE IF EXISTS heroes;
+DROP TABLE IF EXISTS powers;
