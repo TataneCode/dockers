@@ -47,6 +47,9 @@ public sealed class HeroService(IHeroRepository heroRepository, IPowerRepository
     public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default) =>
         heroRepository.DeleteAsync(id, cancellationToken);
 
+    public Task DeleteAllAsync(CancellationToken cancellationToken = default) =>
+        heroRepository.DeleteAllAsync(cancellationToken);
+
     private async Task EnsurePowersExistAsync(
         IReadOnlyList<string> powerIds,
         CancellationToken cancellationToken)

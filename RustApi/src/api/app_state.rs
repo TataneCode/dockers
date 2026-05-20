@@ -2,6 +2,7 @@ use crate::application::{hero_service::HeroService, power_service::PowerService}
 use crate::domain::models::{Hero, Power};
 use crate::application::errors::AppError;
 use crate::domain::repositories::{HeroRepository, PowerRepository};
+use sqlx::MySqlPool;
 use std::sync::Arc;
 
 #[async_trait::async_trait]
@@ -74,4 +75,5 @@ pub type DynPowerService = Arc<dyn PowerServiceTrait>;
 pub struct AppState {
     pub heroes: DynHeroService,
     pub powers: DynPowerService,
+    pub db_pool: MySqlPool,
 }

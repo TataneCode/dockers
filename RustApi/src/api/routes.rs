@@ -1,5 +1,5 @@
 use crate::api::app_state::AppState;
-use crate::api::handlers::{heroes, powers};
+use crate::api::handlers::{heroes, powers, seed};
 use crate::api::openapi::ApiDoc;
 use axum::routing::get;
 use axum::Router;
@@ -25,9 +25,13 @@ pub fn build_router(state: AppState) -> Router {
                 .delete(powers::delete),
         );
 
+    let seed_routes = Router::new()
+        .route("/", axum::routing::post(seed::seed).delete(seed::clean));
+
     let api_routes = Router::new()
         .nest("/heroes", hero_routes)
-        .nest("/powers", power_routes);
+        .nest("/powers", power_routes)
+        .nest("/seed", seed_routes);
 
     Router::new()
         .nest("/api", api_routes)

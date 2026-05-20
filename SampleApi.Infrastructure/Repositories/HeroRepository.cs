@@ -86,4 +86,9 @@ public sealed class HeroRepository(SampleApiDbContext dbContext) : IHeroReposito
         await dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }
+
+    public async Task DeleteAllAsync(CancellationToken cancellationToken = default)
+    {
+        await dbContext.Heroes.ExecuteDeleteAsync(cancellationToken);
+    }
 }

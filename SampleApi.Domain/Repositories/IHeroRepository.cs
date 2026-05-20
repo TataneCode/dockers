@@ -9,4 +9,5 @@ public interface IHeroRepository
     Task<HeroModel> CreateAsync(HeroModel hero, CancellationToken cancellationToken = default);
     Task<HeroModel?> UpdateAsync(HeroModel hero, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
+    Task DeleteAllAsync(CancellationToken cancellationToken = default);
 }

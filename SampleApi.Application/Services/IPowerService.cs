@@ -9,4 +9,5 @@ public interface IPowerService
     Task<PowerModel> CreateAsync(PowerModel power, CancellationToken cancellationToken = default);
     Task<PowerModel?> UpdateAsync(string id, PowerModel power, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
+    Task DeleteAllAsync(CancellationToken cancellationToken = default);
 }

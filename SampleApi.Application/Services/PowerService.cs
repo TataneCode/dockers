@@ -29,4 +29,7 @@ public sealed class PowerService(IPowerRepository powerRepository) : IPowerServi
 
     public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default) =>
         powerRepository.DeleteAsync(id, cancellationToken);
+
+    public Task DeleteAllAsync(CancellationToken cancellationToken = default) =>
+        powerRepository.DeleteAllAsync(cancellationToken);
 }

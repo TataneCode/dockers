@@ -68,6 +68,11 @@ public sealed class PowerRepository(SampleApiDbContext dbContext) : IPowerReposi
         return true;
     }
 
+    public async Task DeleteAllAsync(CancellationToken cancellationToken = default)
+    {
+        await dbContext.Powers.ExecuteDeleteAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<string>> GetMissingIdsAsync(
         IReadOnlyCollection<string> ids,
         CancellationToken cancellationToken = default)

@@ -16,6 +16,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IHeroService, HeroService>();
 builder.Services.AddScoped<IPowerService, PowerService>();
+builder.Services.AddScoped<ISeedService, SeedService>();
 
 var app = builder.Build();
 
@@ -29,5 +30,6 @@ if (app.Environment.IsDevelopment())
 
 app.MapHeroEndpoints();
 app.MapPowerEndpoints();
+app.MapSeedEndpoints();
 
 app.Run();

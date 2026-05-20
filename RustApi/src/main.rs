@@ -46,6 +46,7 @@ async fn main() {
     let state = AppState {
         heroes: hero_service,
         powers: power_service,
+        db_pool: pool,
     };
 
     let router = build_router(state);
