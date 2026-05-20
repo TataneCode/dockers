@@ -37,3 +37,7 @@ dotenvy = "0.15"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1.0.102"
+
+[dev-dependencies]
+mockall = "0.13"
+tokio = { version = "1", features = ["full"] }

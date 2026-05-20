@@ -4,6 +4,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="SampleApi.Application.Tests/SampleApi.Application.Tests.csproj" />
   <Project Path="SampleApi.Application/SampleApi.Application.csproj" />
   <Project Path="SampleApi.Domain/SampleApi.Domain.csproj" />
   <Project Path="SampleApi.Infrastructure/SampleApi.Infrastructure.csproj" />
