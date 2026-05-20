@@ -5,19 +5,34 @@ use utoipa::ToSchema;
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct HeroRequest {
+    /// Full name of the hero
+    #[schema(example = "Peter Parker")]
     pub name: String,
+    /// Superhero alias
+    #[schema(example = "Spider-Man")]
     pub alias: String,
+    /// Origin story or birthplace of the hero
+    #[schema(example = "New York City")]
     pub origin: String,
+    /// IDs of the powers assigned to the hero
     pub power_ids: Vec<String>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct HeroResponse {
+    /// Unique identifier of the hero
     pub id: String,
+    /// Full name of the hero
+    #[schema(example = "Peter Parker")]
     pub name: String,
+    /// Superhero alias
+    #[schema(example = "Spider-Man")]
     pub alias: String,
+    /// Origin story or birthplace of the hero
+    #[schema(example = "New York City")]
     pub origin: String,
+    /// IDs of the powers assigned to the hero
     pub power_ids: Vec<String>,
 }
 

@@ -11,6 +11,7 @@ use axum::Json;
     path = "/api/powers",
     tag = "Powers",
     summary = "Get all powers",
+    description = "Returns a list of all powers.",
     responses(
         (status = 200, description = "List of powers", body = Vec<PowerResponse>)
     )
@@ -25,7 +26,8 @@ pub async fn get_all(State(state): State<AppState>) -> Result<impl IntoResponse,
     get,
     path = "/api/powers/{id}",
     tag = "Powers",
-    summary = "Get power by ID",
+    summary = "Get a power by ID",
+    description = "Returns the power with the specified ID.",
     params(("id" = String, Path, description = "Power ID")),
     responses(
         (status = 200, description = "Power found", body = PowerResponse),
@@ -47,6 +49,7 @@ pub async fn get_by_id(
     path = "/api/powers",
     tag = "Powers",
     summary = "Create a power",
+    description = "Creates a new power and returns the created resource.",
     request_body = PowerRequest,
     responses(
         (status = 201, description = "Power created", body = PowerResponse)
@@ -72,6 +75,7 @@ pub async fn create(
     path = "/api/powers/{id}",
     tag = "Powers",
     summary = "Update a power",
+    description = "Updates an existing power and returns the updated resource.",
     params(("id" = String, Path, description = "Power ID")),
     request_body = PowerRequest,
     responses(
@@ -95,6 +99,7 @@ pub async fn update(
     path = "/api/powers/{id}",
     tag = "Powers",
     summary = "Delete a power",
+    description = "Deletes the power with the specified ID.",
     params(("id" = String, Path, description = "Power ID")),
     responses(
         (status = 204, description = "Power deleted"),

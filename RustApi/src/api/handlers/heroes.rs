@@ -11,6 +11,7 @@ use axum::Json;
     path = "/api/heroes",
     tag = "Heroes",
     summary = "Get all heroes",
+    description = "Returns a list of all heroes.",
     responses(
         (status = 200, description = "List of heroes", body = Vec<HeroResponse>)
     )
@@ -25,7 +26,8 @@ pub async fn get_all(State(state): State<AppState>) -> Result<impl IntoResponse,
     get,
     path = "/api/heroes/{id}",
     tag = "Heroes",
-    summary = "Get hero by ID",
+    summary = "Get a hero by ID",
+    description = "Returns the hero with the specified ID.",
     params(("id" = String, Path, description = "Hero ID")),
     responses(
         (status = 200, description = "Hero found", body = HeroResponse),
@@ -47,6 +49,7 @@ pub async fn get_by_id(
     path = "/api/heroes",
     tag = "Heroes",
     summary = "Create a hero",
+    description = "Creates a new hero and returns the created resource.",
     request_body = HeroRequest,
     responses(
         (status = 201, description = "Hero created", body = HeroResponse),
@@ -73,6 +76,7 @@ pub async fn create(
     path = "/api/heroes/{id}",
     tag = "Heroes",
     summary = "Update a hero",
+    description = "Updates an existing hero and returns the updated resource.",
     params(("id" = String, Path, description = "Hero ID")),
     request_body = HeroRequest,
     responses(
@@ -97,6 +101,7 @@ pub async fn update(
     path = "/api/heroes/{id}",
     tag = "Heroes",
     summary = "Delete a hero",
+    description = "Deletes the hero with the specified ID.",
     params(("id" = String, Path, description = "Hero ID")),
     responses(
         (status = 204, description = "Hero deleted"),

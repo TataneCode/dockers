@@ -1,4 +1,4 @@
-use crate::api::dto::{HeroRequest, HeroResponse, PowerRequest, PowerResponse};
+use crate::api::dto::{HeroRequest, HeroResponse, PowerRequest, PowerResponse, PowerType};
 use utoipa::OpenApi;
 
 #[derive(OpenApi)]
@@ -16,7 +16,7 @@ use utoipa::OpenApi;
         crate::api::handlers::powers::update,
         crate::api::handlers::powers::delete,
     ),
-    components(schemas(HeroRequest, HeroResponse, PowerRequest, PowerResponse)),
+    components(schemas(HeroRequest, HeroResponse, PowerRequest, PowerResponse, PowerType)),
     tags(
         (name = "Heroes", description = "Hero management"),
         (name = "Powers", description = "Power management"),
