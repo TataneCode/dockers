@@ -5,36 +5,8 @@ import { HeroStore } from '../../stores/hero.store';
 @Component({
   selector: 'app-heroes',
   imports: [RouterLink],
-  template: `
-    <div class="page">
-      <div class="page-header">
-        <h1>Heroes</h1>
-        <a routerLink="/heroes/new" class="btn btn-primary">+ New Hero</a>
-      </div>
-
-      @if (store.loading()) {
-        <p class="loading">Loading…</p>
-      } @else {
-        <ul class="card-list">
-          @for (hero of store.heroes(); track hero.id) {
-            <li class="card">
-              <div class="card-body">
-                <strong>{{ hero.alias }}</strong>
-                <span class="text-muted">{{ hero.name }}</span>
-              </div>
-              <div class="card-actions">
-                <a [routerLink]="['/heroes', hero.id]" class="btn btn-sm">View</a>
-                <a [routerLink]="['/heroes', hero.id, 'edit']" class="btn btn-sm btn-secondary">Edit</a>
-                <button class="btn btn-sm btn-danger" (click)="delete(hero.id)">Delete</button>
-              </div>
-            </li>
-          } @empty {
-            <p>No heroes yet. <a routerLink="/heroes/new">Add one!</a></p>
-          }
-        </ul>
-      }
-    </div>
-  `,
+  templateUrl: './heroes.component.html',
+  styleUrl: './heroes.component.scss',
 })
 export class HeroesComponent implements OnInit {
   readonly store = inject(HeroStore);

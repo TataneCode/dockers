@@ -1,0 +1,39 @@
+<div class="page">
+  <h1>{{ isEdit ? 'Edit Hero' : 'New Hero' }}</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+    <div class="form-group">
+      <label for="name">Real Name</label>
+      <input id="name" formControlName="name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label for="alias">Hero Alias</label>
+      <input id="alias" formControlName="alias" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label for="origin">Origin</label>
+      <input id="origin" formControlName="origin" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Powers</label>
+      @for (power of powerStore.powers(); track power.id) {
+        <label class="checkbox-label">
+          <input type="checkbox" [value]="power.id"
+            [checked]="isPowerSelected(power.id)"
+            (change)="togglePower(power.id, $event)" />
+          {{ power.name }} ({{ power.type }})
+        </label>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+        {{ isEdit ? 'Save Changes' : 'Create Hero' }}
+      </button>
+      <a routerLink="/heroes" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>

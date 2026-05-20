@@ -1,0 +1,37 @@
+<div class="page">
+  <h1>{{ isEdit ? 'Edit Power' : 'New Power' }}</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" formControlName="name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="type">Type</label>
+      <select id="type" formControlName="type" class="form-control">
+        <option value="Physical">Physical</option>
+        <option value="Mental">Mental</option>
+        <option value="Elemental">Elemental</option>
+        <option value="Tech">Tech</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="level">Level (1–10)</label>
+      <input id="level" type="number" formControlName="level" class="form-control" min="1" max="10" />
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+        {{ isEdit ? 'Save Changes' : 'Create Power' }}
+      </button>
+      <a routerLink="/heroes" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
