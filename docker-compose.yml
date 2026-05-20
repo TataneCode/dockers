@@ -3,8 +3,6 @@ services:
     image: mysql:8.4
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-    ports:
-      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
@@ -29,7 +27,7 @@ services:
     networks:
       - app
 
-  backend:
+  nest-api:
     build:
       context: ./NestApi
       dockerfile: Dockerfile
@@ -46,12 +44,12 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/openapi`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.routers.backend.priority=10"
-      - "traefik.http.services.backend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.nest-api.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/openapi`)"
+      - "traefik.http.routers.nest-api.entrypoints=web"
+      - "traefik.http.routers.nest-api.priority=10"
+      - "traefik.http.services.nest-api.loadbalancer.server.port=3000"
 
-  rust-backend:
+  rust-api:
     build:
       context: ./RustApi
       dockerfile: Dockerfile
@@ -68,12 +66,35 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.rust-backend.rule=PathPrefix(`/rust-api`)"
-      - "traefik.http.routers.rust-backend.entrypoints=web"
-      - "traefik.http.routers.rust-backend.priority=10"
+      - "traefik.http.routers.rust-api.rule=PathPrefix(`/rust-api`)"
+      - "traefik.http.routers.rust-api.entrypoints=web"
+      - "traefik.http.routers.rust-api.priority=10"
       - "traefik.http.middlewares.rust-strip.stripprefix.prefixes=/rust-api"
-      - "traefik.http.routers.rust-backend.middlewares=rust-strip"
-      - "traefik.http.services.rust-backend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.rust-api.middlewares=rust-strip"
+      - "traefik.http.services.rust-api.loadbalancer.server.port=3000"
+
+  sample-api:
+    build:
+      context: .
+      dockerfile: SampleApi/Dockerfile
+    environment:
+      ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;
+      JsonSeed__DataPath: /data
+    volumes:
+      - sample-data:/data
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sample-api.rule=PathPrefix(`/sample-api`)"
+      - "traefik.http.routers.sample-api.entrypoints=web"
+      - "traefik.http.routers.sample-api.priority=10"
+      - "traefik.http.middlewares.sample-strip.stripprefix.prefixes=/sample-api"
+      - "traefik.http.routers.sample-api.middlewares=sample-strip"
+      - "traefik.http.services.sample-api.loadbalancer.server.port=5025"
 
   frontend:
     build:
@@ -94,3 +115,4 @@ networks:
 volumes:
   mysql-data:
   nest-data:
+  sample-data:

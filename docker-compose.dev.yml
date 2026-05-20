@@ -8,26 +8,70 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -prootpassword"]
       interval: 10s
       timeout: 5s
       retries: 12
 
-  backend:
+  nest-api:
+    build:
+      context: ./NestApi
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/nest_api
+      JSON_SEED_DATA_PATH: /app/.data
+    volumes:
+      - nest-data:/app/.data
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  rust-api:
+    build:
+      context: ./RustApi
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/rust_api
+      JSON_SEED_ENABLED: "true"
+      JSON_SEED_DATA_PATH: /app/.data
+      RUST_LOG: rust_api=info
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  sample-api:
     build:
       context: .
       dockerfile: SampleApi/Dockerfile.dev
     ports:
-      - "8008:5025"
+      - "5025:5025"
     environment:
       ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;
       JsonSeed__DataPath: /data
     volumes:
       - ./SampleApi/.data:/data
+    networks:
+      - app
     depends_on:
       mysql:
         condition: service_healthy
 
+networks:
+  app:
+
 volumes:
   mysql-data:
+  nest-data:
