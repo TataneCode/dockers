@@ -7,7 +7,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+      - ../docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -prootpassword"]
       interval: 10s
@@ -16,7 +16,7 @@ services:
 
   backend:
     build:
-      context: .
+      context: ../DotnetApi
       dockerfile: SampleApi/Dockerfile.dev
     ports:
       - "8008:5025"
@@ -24,7 +24,7 @@ services:
       ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;
       JsonSeed__DataPath: /data
     volumes:
-      - ./SampleApi/.data:/data
+      - ../DotnetApi/SampleApi/.data:/data
     depends_on:
       mysql:
         condition: service_healthy

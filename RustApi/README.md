@@ -1,7 +1,7 @@
 # RustApi
 
 Rust backend for the Heroes & Powers sample, built with **Axum** (HTTP) and **SQLx** (MySQL).  
-It reproduces the same REST API contract as `NestApi/` and `SampleApi/`.
+It reproduces the same REST API contract as `NestApi/` and `DotnetApi/SampleApi/`.
 
 ## Stack
 

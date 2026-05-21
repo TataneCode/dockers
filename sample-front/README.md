@@ -33,7 +33,7 @@ npm run watch          # watch build (development configuration)
 ## Unit tests
 
 ```bash
-npm test               # run all specs with Karma once
+npm test               # run all specs with Vitest
 ```
 
 ## Docker (release)
@@ -46,4 +46,3 @@ docker compose up --build frontend
 
 The image uses a multi-stage build (`node:22` → `almalinux:9-minimal` + nginx) and serves the Angular app over plain HTTP on port 80.  
 TLS is terminated upstream by Traefik — see the root `README.md` for the HTTPS certificate setup.
-

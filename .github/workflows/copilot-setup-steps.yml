@@ -36,7 +36,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore backend dependencies
-        run: dotnet restore sample-back.slnx
+        run: dotnet restore DotnetApi/sample-back.slnx
 
       - name: Install Playwright Chromium
         working-directory: sample-front

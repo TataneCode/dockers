@@ -13,9 +13,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-backend",
-      "program": "${workspaceFolder}/SampleApi/bin/Debug/net10.0/SampleApi.dll",
+      "program": "${workspaceFolder}/DotnetApi/SampleApi/bin/Debug/net10.0/SampleApi.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/SampleApi",
+      "cwd": "${workspaceFolder}/DotnetApi/SampleApi",
       "stopAtEntry": false,
       "serverReadyAction": {
         "action": "openExternally",
@@ -91,10 +91,10 @@
       "preLaunchTask": "docker-run: debug",
       "platform": "netCore",
       "sourceFileMap": {
-        "/app": "${workspaceFolder}/SampleApi"
+        "/app": "${workspaceFolder}/DotnetApi/SampleApi"
       },
       "netCore": {
-        "appProject": "${workspaceFolder}/SampleApi/SampleApi.csproj"
+        "appProject": "${workspaceFolder}/DotnetApi/SampleApi/SampleApi.csproj"
       }
     }
   ],

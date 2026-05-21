@@ -1,0 +1,95 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nest-api:
+    name: NestApi
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: NestApi/package-lock.json
+
+      - name: Install dependencies
+        working-directory: NestApi
+        run: npm ci
+
+      - name: Run tests
+        working-directory: NestApi
+        run: npm test
+
+  rust-api:
+    name: RustApi
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: RustApi
+
+      - name: Run tests
+        working-directory: RustApi
+        run: cargo test --locked
+
+  dotnet-api:
+    name: DotnetApi
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore DotnetApi/sample-back.slnx
+
+      - name: Run tests
+        run: dotnet test DotnetApi/sample-back.slnx --no-restore --verbosity normal
+
+  front-office:
+    name: Front office
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: sample-front/package-lock.json
+
+      - name: Install dependencies
+        working-directory: sample-front
+        run: npm ci
+
+      - name: Run tests
+        working-directory: sample-front
+        run: npm test

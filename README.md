@@ -5,7 +5,7 @@ Full-stack sample application with an **Angular 19** frontend and three backend 
 | Directory | Stack | DB schema |
 |-----------|-------|-----------|
 | `NestApi/` | NestJS 11 + Prisma | `nest_api` |
-| `SampleApi/` | .NET 10 Minimal API + EF Core | `sample_api` |
+| `DotnetApi/` | .NET 10 Minimal API + EF Core | `sample_api` |
 | `RustApi/` | Rust · Axum + SQLx | `rust_api` |
 
 ## Project structure
@@ -13,7 +13,13 @@ Full-stack sample application with an **Angular 19** frontend and three backend 
 ```text
 .
 ├── NestApi/        NestJS 11 backend
-├── SampleApi/      .NET 10 Minimal API backend
+├── DotnetApi/      .NET 10 backend workspace
+│   ├── SampleApi/                  Minimal API host
+│   ├── SampleApi.Application/      Application layer
+│   ├── SampleApi.Application.Tests/
+│   ├── SampleApi.Domain/
+│   ├── SampleApi.Infrastructure/
+│   └── sample-back.slnx
 ├── RustApi/        Rust (Axum + SQLx) backend
 ├── sample-front/   Angular 19 standalone frontend
 ├── docker/
@@ -119,7 +125,7 @@ npm run start:dev
 ### .NET backend
 
 ```bash
-dotnet run --project SampleApi/SampleApi.csproj
+dotnet run --project DotnetApi/SampleApi/SampleApi.csproj
 ```
 
 | URL | Description |
@@ -287,8 +293,8 @@ cargo test
 ### .NET
 
 ```bash
-dotnet build sample-back.slnx
-dotnet test sample-back.slnx
+dotnet build DotnetApi/sample-back.slnx
+dotnet test DotnetApi/sample-back.slnx
 ```
 
 ### Angular

@@ -134,7 +134,7 @@ services:
 
   sample-api:
     build:
-      context: .
+      context: ./DotnetApi
       dockerfile: SampleApi/Dockerfile
     environment:
       ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;

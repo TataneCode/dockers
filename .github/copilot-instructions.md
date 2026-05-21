@@ -4,17 +4,17 @@
 
 This repository contains two separate sample applications:
 
-- `SampleApi/` is a minimal ASP.NET Core API targeting `net10.0`. It is the only project in `sample-back.slnx`.
+- `DotnetApi/` contains the .NET 10 backend workspace, and `DotnetApi/SampleApi/` is the minimal ASP.NET Core API host project targeting `net10.0`.
 - `sample-front/` is an Angular 19 application created with Angular CLI.
 
 There is no root-level orchestrator for running both apps together, no shared library between them, and no existing frontend-to-backend integration layer. Treat backend and frontend work as separate unless you add that wiring explicitly.
 
 ## Build and test commands
 
-### Backend (`SampleApi/`)
+### Backend (`DotnetApi/`)
 
-- Build: `dotnet build sample-back.slnx`
-- Run locally: `dotnet run --project SampleApi/SampleApi.csproj`
+- Build: `dotnet build DotnetApi/sample-back.slnx`
+- Run locally: `dotnet run --project DotnetApi/SampleApi/SampleApi.csproj`
 
 ### Frontend (`sample-front/`)
 
@@ -33,10 +33,10 @@ Copilot cloud-agent setup lives in `.github/workflows/copilot-setup-steps.yml` a
 
 ### Backend
 
-- `SampleApi/Program.cs` contains the entire API. It uses top-level statements and the minimal API style; there are no controllers, service classes, or separate endpoint modules yet.
+- `DotnetApi/SampleApi/Program.cs` contains the entire API. It uses top-level statements and the minimal API style; there are no controllers, service classes, or separate endpoint modules yet.
 - OpenAPI is registered with `AddOpenApi()` and only exposed in Development via `app.MapOpenApi()`.
 - The only current endpoint is `GET /weatherforecast`, which returns generated in-memory data.
-- Development launch settings are in `SampleApi/Properties/launchSettings.json`, with HTTP on `http://localhost:5025` and HTTPS on `https://localhost:7131`.
+- Development launch settings are in `DotnetApi/SampleApi/Properties/launchSettings.json`, with HTTP on `http://localhost:5025` and HTTPS on `https://localhost:7131`.
 
 ### Frontend
 
