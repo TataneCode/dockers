@@ -1,59 +1,49 @@
-# SampleFront
+# sample-front
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.17.
+Angular 19 standalone frontend for the Heroes & Powers application.  
+The dev server proxies `/api/*` to the selected backend via npm run scripts.
 
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Run locally
 
 ```bash
-ng generate component component-name
+npm install
+
+npm run start:nestapi    # proxy /api → localhost:3000  (NestApi)
+npm run start:rustapi    # proxy /api → localhost:3001  (RustApi)
+npm run start:sampleapi  # proxy /api → localhost:5025  (SampleApi)
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open `http://localhost:4200` in your browser.
+
+Each script uses a dedicated proxy config:
+
+| Script | Proxy config | Target |
+|--------|-------------|--------|
+| `start:nestapi` | `proxy.conf.json` | `http://localhost:3000` |
+| `start:rustapi` | `proxy.conf.rustapi.json` | `http://localhost:3001` |
+| `start:sampleapi` | `proxy.conf.sampleapi.json` | `http://localhost:5025` |
+
+## Build
 
 ```bash
-ng generate --help
+npm run build          # production build → dist/sample-front/browser/
+npm run watch          # watch build (development configuration)
 ```
 
-## Building
-
-To build the project run:
+## Unit tests
 
 ```bash
-ng build
+npm test               # run all specs with Karma once
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Docker (release)
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+The production image is built as part of the release Docker Compose from the repository root:
 
 ```bash
-ng test
+docker compose up --build frontend
 ```
 
-## Running end-to-end tests
+The image uses a multi-stage build (`node:22` → `almalinux:9-minimal` + nginx) and serves the Angular app over plain HTTP on port 80.  
+TLS is terminated upstream by Traefik — see the root `README.md` for the HTTPS certificate setup.
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

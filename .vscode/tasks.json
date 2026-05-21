@@ -58,6 +58,62 @@
         "appProject": "${workspaceFolder}/SampleApi/SampleApi.csproj",
         "enableDebugging": true
       }
+    },
+    {
+      "type": "docker-build",
+      "label": "docker-build: nest-api",
+      "dockerBuild": {
+        "tag": "nest-api:latest",
+        "context": "${workspaceFolder}/NestApi",
+        "dockerfile": "${workspaceFolder}/NestApi/Dockerfile"
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: nest-api",
+      "dependsOn": ["docker-build: nest-api"],
+      "dockerRun": {
+        "image": "nest-api:latest",
+        "env": {
+          "PORT": "3000",
+          "DATABASE_URL": "mysql://heroes_app:heroes_app@host.docker.internal:3306/nest_api",
+          "JSON_SEED_DATA_PATH": "/app/.data"
+        },
+        "ports": [{ "containerPort": 3000, "hostPort": 3000 }],
+        "customOptions": "--add-host=host.docker.internal:host-gateway",
+        "remove": true
+      },
+      "node": {
+        "enableDebugging": true,
+        "package": "${workspaceFolder}/NestApi/package.json"
+      }
+    },
+    {
+      "type": "docker-build",
+      "label": "docker-build: rust-api",
+      "dockerBuild": {
+        "tag": "rust-api:latest",
+        "context": "${workspaceFolder}/RustApi",
+        "dockerfile": "${workspaceFolder}/RustApi/Dockerfile"
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: rust-api",
+      "dependsOn": ["docker-build: rust-api"],
+      "dockerRun": {
+        "image": "rust-api:latest",
+        "env": {
+          "PORT": "3000",
+          "DATABASE_URL": "mysql://heroes_app:heroes_app@host.docker.internal:3306/rust_api",
+          "JSON_SEED_ENABLED": "true",
+          "JSON_SEED_DATA_PATH": "/app/.data",
+          "RUST_LOG": "rust_api=info"
+        },
+        "ports": [{ "containerPort": 3000, "hostPort": 3001 }],
+        "customOptions": "--add-host=host.docker.internal:host-gateway",
+        "remove": true
+      }
     }
   ]
 }

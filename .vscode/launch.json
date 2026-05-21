@@ -26,11 +26,42 @@
       }
     },
     {
-      "name": "Frontend (npm)",
+      "name": "Backend (NestApi Docker)",
+      "type": "docker",
+      "request": "launch",
+      "preLaunchTask": "docker-run: nest-api",
+      "platform": "node",
+      "node": {
+        "package": "${workspaceFolder}/NestApi/package.json"
+      }
+    },
+    {
+      "name": "Backend (RustApi)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "cargo run",
+      "cwd": "${workspaceFolder}/RustApi"
+    },
+    {
+      "name": "Frontend (npm - NestApi)",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start"],
+      "runtimeArgs": ["run", "start:nestapi"],
+      "cwd": "${workspaceFolder}/sample-front",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "Local:\\s+(http://\\S+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    },
+    {
+      "name": "Frontend (npm - RustApi)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:rustapi"],
       "cwd": "${workspaceFolder}/sample-front",
       "console": "integratedTerminal",
       "serverReadyAction": {
@@ -69,12 +100,16 @@
   ],
   "compounds": [
     {
-      "name": "Full Stack",
-      "configurations": ["Backend (Nest)", "Frontend (npm)"]
+      "name": "Full Stack (NestApi)",
+      "configurations": ["Backend (Nest)", "Frontend (npm - NestApi)"]
     },
     {
       "name": "Full Stack (.NET)",
       "configurations": ["Backend (dotnet)", "Frontend (npm - SampleApi)"]
+    },
+    {
+      "name": "Full Stack (Rust)",
+      "configurations": ["Backend (RustApi)", "Frontend (npm - RustApi)"]
     }
   ]
 }

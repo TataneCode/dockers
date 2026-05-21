@@ -1,31 +1,57 @@
 # NestApi
 
-NestJS 11 backend for the Heroes & Powers sample. It mirrors the `SampleApi/` CRUD contract with JSON-file persistence under `.data/`.
+NestJS 11 backend for the Heroes & Powers application.  
+Uses **Prisma** for database access against a MySQL `nest_api` schema and exposes Swagger UI + OpenAPI.
 
-## Local commands
+## Run locally
 
 ```bash
+# Start MySQL (shared with other backends)
+docker compose -f docker-compose.dev.yml up -d mysql
+
 npm install
 npm run start:dev
 ```
 
-The API starts on `http://localhost:3000`, Swagger UI is at `http://localhost:3000/docs`, and the OpenAPI document is at `http://localhost:3000/openapi/v1.json`.
+| URL | Description |
+|-----|-------------|
+| `http://localhost:3000/api/heroes` | Heroes CRUD |
+| `http://localhost:3000/api/powers` | Powers CRUD |
+| `http://localhost:3000/docs` | Swagger UI |
+| `http://localhost:3000/openapi/v1.json` | OpenAPI spec |
 
-## Validation
+Prisma migrations are applied automatically on startup via `prisma migrate deploy` (bundled in `start:prod`).  
+For local dev (`start:dev`) ensure migrations are up to date with:
 
 ```bash
-npm run lint
-npm test -- --runInBand
-npm run test:e2e -- --runInBand
+npm run prisma:migrate:deploy
+```
+
+## Validate
+
+```bash
 npm run build
+npm test
 ```
 
 ## Docker
 
-Build the production image from the repository root with:
+### Development compose
+
+The `nest-api` service in `docker-compose.dev.yml` exposes port **3000** on the host so the Angular dev server can proxy to it.
 
 ```bash
-docker compose up --build
+docker compose -f docker-compose.dev.yml up --build nest-api
 ```
 
-The full project workflow is documented in the repository root `README.md`.
+### Release compose
+
+In `docker-compose.yml` the service is behind Traefik (HTTPS on port 4443).  
+Routes: `/api`, `/docs`, `/openapi`.
+
+```bash
+docker compose up --build nest-api
+```
+
+See the root `README.md` for the full stack startup and mkcert HTTPS setup.
+

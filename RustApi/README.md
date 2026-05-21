@@ -65,7 +65,7 @@ JSON_SEED_DATA_PATH=.data
 
 ```bash
 # Start MySQL (shared with other backends)
-docker compose up -d mysql
+docker compose -f docker-compose.dev.yml up -d mysql
 
 cargo run
 ```
@@ -99,10 +99,21 @@ cargo build --release # release
 
 ## Docker
 
+### Development compose
+
+The `rust-api` service in `docker-compose.dev.yml` maps container port 3000 to host port **3001**.
+
 ```bash
-# From repository root
-docker compose up --build rust-backend
+docker compose -f docker-compose.dev.yml up --build rust-api
 ```
 
-The image uses a multi-stage build (`rust:1.87-slim` → `debian:bookworm-slim`).  
-TLS is not handled by the application — it is terminated upstream by Traefik or a k3s ingress.
+### Release compose
+
+In `docker-compose.yml` the service is behind Traefik (HTTPS on port 4443) at the `/rust-api` prefix (stripped before forwarding).  
+Routes: `/rust-api/api/…`, `/rust-api/scalar`, `/rust-api/openapi.json`.
+
+```bash
+docker compose up --build rust-api
+```
+
+See the root `README.md` for the full stack startup and mkcert HTTPS setup.

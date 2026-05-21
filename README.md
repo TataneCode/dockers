@@ -1,6 +1,6 @@
 # Heroes & Powers
 
-Full-stack sample application with an **Angular 19** frontend and three backend implementations that expose the same Heroes & Powers REST API:
+Full-stack sample application with an **Angular 19** frontend and three backend implementations that expose the same Heroes & Powers REST API.
 
 | Directory | Stack | DB schema |
 |-----------|-------|-----------|
@@ -16,6 +16,16 @@ Full-stack sample application with an **Angular 19** frontend and three backend 
 ├── SampleApi/      .NET 10 Minimal API backend
 ├── RustApi/        Rust (Axum + SQLx) backend
 ├── sample-front/   Angular 19 standalone frontend
+├── docker/
+│   ├── certs/              mkcert certificates (git-ignored)
+│   ├── grafana/
+│   │   └── provisioning/   Grafana auto-provisioned datasources
+│   ├── loki/               Grafana Loki config
+│   ├── mysql/init/         MySQL init SQL scripts
+│   ├── otelcol/            OpenTelemetry Collector config
+│   ├── tempo/              Grafana Tempo config
+│   └── traefik/dynamic/    Traefik TLS dynamic config
+├── archive/        Previous docker-compose files
 └── .vscode/        Workspace launch/tasks
 ```
 
@@ -34,95 +44,236 @@ Full-stack sample application with an **Angular 19** frontend and three backend 
 | PUT | `/api/powers/{id}` | Update power |
 | DELETE | `/api/powers/{id}` | Delete power |
 
+## Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose plugin)
+- [Node.js 22+](https://nodejs.org/) — for local frontend / NestApi development
+- [.NET 10 SDK](https://dotnet.microsoft.com/download) — for local SampleApi development
+- [Rust](https://rustup.rs/) — for local RustApi development
+- [mkcert](https://github.com/FiloSottile/mkcert) — for local HTTPS certificates (release compose only)
+
+## HTTPS certificate setup (mkcert)
+
+The release Docker Compose (`docker-compose.yml`) runs Traefik with HTTPS on port **4443**.  
+Traefik reads a locally-trusted certificate from `docker/certs/`. Follow these steps once per machine.
+
+### 1 — Install mkcert
+
+```bash
+# macOS
+brew install mkcert
+
+# Windows (Chocolatey)
+choco install mkcert
+
+# Linux (apt)
+sudo apt install libnss3-tools
+curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
+chmod +x mkcert-v*-linux-amd64
+sudo mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert
+```
+
+### 2 — Install the local CA
+
+This registers the mkcert CA in your system/browser trust stores so the certificate is accepted without warnings.
+
+```bash
+mkcert -install
+```
+
+### 3 — Generate the certificate
+
+Run this from the repository root. The files land directly in the directory Traefik mounts.
+
+```bash
+mkcert \
+  -cert-file docker/certs/local.pem \
+  -key-file  docker/certs/local-key.pem \
+  localhost 127.0.0.1
+```
+
+The certificate files are git-ignored. You only need to regenerate them if you delete them or move to a new machine.
+
 ## Run locally without Docker
+
+Start only the database (shared across all backends):
+
+```bash
+docker compose -f docker-compose.dev.yml up -d mysql
+```
 
 ### NestJS backend
 
 ```bash
-docker compose up -d mysql
 cd NestApi
 npm install
-npm run prisma:migrate:deploy
 npm run start:dev
 ```
 
-- API: `http://localhost:3000`
-- Swagger UI: `http://localhost:3000/docs`
-- OpenAPI JSON: `http://localhost:3000/openapi/v1.json`
+| URL | Description |
+|-----|-------------|
+| `http://localhost:3000/api/heroes` | Heroes CRUD |
+| `http://localhost:3000/docs` | Swagger UI |
+| `http://localhost:3000/openapi/v1.json` | OpenAPI spec |
+
+### .NET backend
+
+```bash
+dotnet run --project SampleApi/SampleApi.csproj
+```
+
+| URL | Description |
+|-----|-------------|
+| `http://localhost:5025/api/heroes` | Heroes CRUD |
+| `http://localhost:5025/openapi/v1.json` | OpenAPI spec |
 
 ### Rust backend
 
 ```bash
-docker compose up -d mysql
 cd RustApi
-cp .env.example .env   # or edit DATABASE_URL / PORT directly
 cargo run
 ```
 
-- API: `http://localhost:3001`
-- Scalar UI: `http://localhost:3001/scalar`
-- OpenAPI JSON: `http://localhost:3001/openapi.json`
-
-The Rust backend runs its own SQLx migrations on startup against the `rust_api` schema and optionally seeds data from `.data/powers.json` and `.data/heroes.json` when `JSON_SEED_ENABLED=true`.
+| URL | Description |
+|-----|-------------|
+| `http://localhost:3001/api/heroes` | Heroes CRUD |
+| `http://localhost:3001/scalar` | Scalar OpenAPI UI |
+| `http://localhost:3001/openapi.json` | OpenAPI spec |
 
 ### Angular frontend
+
+Run with the desired backend proxy:
 
 ```bash
 cd sample-front
 npm install
-npm start
+
+npm run start:nestapi    # proxy /api → localhost:3000 (NestApi)
+npm run start:rustapi    # proxy /api → localhost:3001 (RustApi)
+npm run start:sampleapi  # proxy /api → localhost:5025 (SampleApi)
 ```
 
-The Angular dev server runs on `http://localhost:4200` and proxies `/api/*` to the active backend.
+Frontend runs on `http://localhost:4200`.
 
-## Run from VS Code
+## Run with Docker Compose — development
 
-Root `.vscode/launch.json` provides:
+Starts MySQL, all three APIs, and the monitoring stack. Ports are exposed for local frontend development.  
+The Angular frontend is served separately with `npm run start:<api>`.
 
-| Name | What it does |
-|------|-------------|
-| **Backend (Nest)** | Starts the Nest backend in watch mode |
-| **Frontend (npm)** | Starts Angular against the Nest backend |
-| **Full Stack** | Starts Nest + Angular together |
-| **Backend (dotnet)** | Starts the .NET backend |
-| **Frontend (npm - SampleApi)** | Starts Angular against the .NET backend |
-| **Full Stack (.NET)** | Starts .NET + Angular together |
-| **Backend (Docker debug)** | Docker debug flow for SampleApi |
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
 
-## Run with Docker Compose
+| Service | Host port |
+|---------|-----------|
+| MySQL | 3306 |
+| NestApi | 3000 |
+| RustApi | 3001 |
+| SampleApi | 5025 |
+| Grafana | 3002 *(open, no login)* |
+
+> Grafana URL: `http://localhost:3002` — no credentials required in dev mode.
+
+## Run with Docker Compose — release
+
+> **Requires the mkcert certificate** — see [HTTPS certificate setup](#https-certificate-setup-mkcert) above.
+
+Starts the full stack (DB + 3 APIs + Traefik + Angular frontend + monitoring stack).  
+HTTP on port 4208 redirects automatically to HTTPS on port **4443**.
 
 ```bash
 docker compose up --build
 ```
 
-This starts:
+| Service | URL |
+|---------|-----|
+| Angular frontend | `https://localhost:4443/` |
+| NestJS API | `https://localhost:4443/api/` |
+| NestJS Swagger | `https://localhost:4443/docs` |
+| Rust API | `https://localhost:4443/rust-api/api/` |
+| Rust Scalar UI | `https://localhost:4443/rust-api/scalar` |
+| SampleApi | `https://localhost:4443/sample-api/api/` |
+| Grafana | `http://localhost:3000` *(admin / admin)* |
 
-- Traefik on `http://localhost:4208`
-- Angular frontend
-- NestJS backend (`nest_api` schema)
-- Rust backend (`rust_api` schema)
-- Shared MySQL instance
+TLS is terminated by Traefik using the mkcert certificate in `docker/certs/`.  
+The dynamic TLS configuration is in `docker/traefik/dynamic/tls.yml`.
 
-| Service | URL via Traefik |
-|---------|----------------|
-| Angular frontend | `http://localhost:4208/` |
-| NestJS API | `http://localhost:4208/api/` |
-| NestJS Swagger | `http://localhost:4208/docs` |
-| Rust API | `http://localhost:4208/rust-api/api/` |
-| Rust Scalar UI | `http://localhost:4208/rust-api/scalar` |
+## Run from VS Code
 
-Each backend applies its own migrations on startup. TLS termination is handled by Traefik; all backends listen on plain HTTP internally.
+Root `.vscode/launch.json` provides the following configurations:
 
-## Validate / build
+| Name | What it does |
+|------|-------------|
+| **Backend (Nest)** | Starts NestApi in watch mode (`npm run start:dev`) |
+| **Backend (NestApi Docker)** | Builds + runs NestApi via Docker with Node debugger |
+| **Backend (dotnet)** | Starts SampleApi with the .NET debugger |
+| **Backend (Docker debug)** | Builds + runs SampleApi debug container with vsdbg |
+| **Backend (RustApi)** | Starts RustApi via `cargo run` |
+| **Frontend (npm - NestApi)** | Angular dev server proxied to NestApi (port 3000) |
+| **Frontend (npm - RustApi)** | Angular dev server proxied to RustApi (port 3001) |
+| **Frontend (npm - SampleApi)** | Angular dev server proxied to SampleApi (port 5025) |
+
+Compound configurations:
+
+| Name | Starts |
+|------|--------|
+| **Full Stack (NestApi)** | Backend (Nest) + Frontend (npm - NestApi) |
+| **Full Stack (.NET)** | Backend (dotnet) + Frontend (npm - SampleApi) |
+| **Full Stack (Rust)** | Backend (RustApi) + Frontend (npm - RustApi) |
+
+## Observability (traces & logs)
+
+All three backends are instrumented with **OpenTelemetry** and export traces and logs to a shared collector. The monitoring stack runs alongside the application services in both compose modes.
+
+```
+App → OTel Collector (4317 gRPC) → Tempo (traces)
+                                 → Loki  (logs)
+                                        ↓
+                                   Grafana :3000
+```
+
+### Components
+
+| Service | Image | Purpose |
+|---------|-------|---------|
+| `otelcol` | `otel/opentelemetry-collector-contrib` | Receives OTLP, fans out to Tempo + Loki |
+| `tempo` | `grafana/tempo` | Distributed trace storage |
+| `loki` | `grafana/loki` | Log aggregation |
+| `grafana` | `grafana/grafana` | Dashboards, Explore, trace↔log correlation |
+
+Datasources (Tempo and Loki) are auto-provisioned — no manual setup needed.
+
+### Accessing Grafana
+
+| Mode | URL | Auth |
+|------|-----|------|
+| Dev | `http://localhost:3002` | None — anonymous admin access |
+| Release | `http://localhost:3000` | `admin` / `admin` |
+
+### Comparing API execution times
+
+1. Open Grafana → **Explore**
+2. Select the **Tempo** datasource
+3. Use **Search** tab, filter by `service.name`: `nest-api`, `rust-api`, or `sample-api`
+4. Click any trace to see per-span durations (HTTP handler, DB query, etc.)
+5. Use the **Logs** link on a span to jump directly to the correlated Loki logs
+
+### API instrumentation details
+
+| Backend | Traces | Logs |
+|---------|--------|------|
+| NestJS | `@opentelemetry/auto-instrumentations-node` | `OTLPLogExporter` via `BatchLogRecordProcessor` |
+| Rust/Axum | `tracing-opentelemetry` layer | `opentelemetry-appender-tracing` bridges `tracing` events |
+| .NET | `AddAspNetCoreInstrumentation()` | `ILogger` → `AddOtlpExporter()` |
+
+## Build & validate
 
 ### NestJS
 
 ```bash
 cd NestApi
-npm run lint
-npm test -- --runInBand
-npm run test:e2e -- --runInBand
 npm run build
+npm test
 ```
 
 ### Rust
@@ -137,19 +288,13 @@ cargo test
 
 ```bash
 dotnet build sample-back.slnx
+dotnet test sample-back.slnx
 ```
 
-## Alternate .NET backend
-
-`SampleApi/` stays available as the reference implementation.
+### Angular
 
 ```bash
-dotnet run --project SampleApi/SampleApi.csproj
-```
-
-Starts on `http://localhost:5025`, schema `sample_api`, applies EF Core migrations on startup.
-
-```bash
-# Docker Compose (dev)
-docker compose -f docker-compose.dev.yml up --build
+cd sample-front
+npm run build
+npm test
 ```

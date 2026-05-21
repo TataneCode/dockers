@@ -35,8 +35,11 @@ dist/
 .angular/
 
 # ──────────────────────────────────────────────
-# Environment & secrets
+# TLS certificates (mkcert — never commit)
 # ──────────────────────────────────────────────
+docker/certs/*.pem
+
+
 .env
 .env.*
 !.env.example

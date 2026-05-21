@@ -20,12 +20,65 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:4208"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:4443"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
     ports:
       - "4208:4208"
+      - "4443:4443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./docker/certs:/certs:ro
     networks:
       - app
+
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./docker/otelcol/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - app
+    depends_on:
+      - tempo
+      - loki
+
+  tempo:
+    image: grafana/tempo:latest
+    command: ["-config.file=/etc/tempo/config.yaml"]
+    volumes:
+      - ./docker/tempo/config.yaml:/etc/tempo/config.yaml:ro
+      - tempo-data:/var/tempo
+    networks:
+      - app
+
+  loki:
+    image: grafana/loki:latest
+    command: ["-config.file=/etc/loki/config.yaml"]
+    volumes:
+      - ./docker/loki/config.yaml:/etc/loki/config.yaml:ro
+      - loki-data:/loki
+    networks:
+      - app
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - app
+    depends_on:
+      - tempo
+      - loki
 
   nest-api:
     build:
@@ -35,6 +88,8 @@ services:
       PORT: 3000
       DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/nest_api
       JSON_SEED_DATA_PATH: /app/.data
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: nest-api
     volumes:
       - nest-data:/app/.data
     networks:
@@ -45,7 +100,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nest-api.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/openapi`)"
-      - "traefik.http.routers.nest-api.entrypoints=web"
+      - "traefik.http.routers.nest-api.entrypoints=websecure"
+      - "traefik.http.routers.nest-api.tls=true"
       - "traefik.http.routers.nest-api.priority=10"
       - "traefik.http.services.nest-api.loadbalancer.server.port=3000"
 
@@ -59,6 +115,8 @@ services:
       JSON_SEED_ENABLED: "true"
       JSON_SEED_DATA_PATH: /app/.data
       RUST_LOG: rust_api=info
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: rust-api
     networks:
       - app
     depends_on:
@@ -67,7 +125,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.rust-api.rule=PathPrefix(`/rust-api`)"
-      - "traefik.http.routers.rust-api.entrypoints=web"
+      - "traefik.http.routers.rust-api.entrypoints=websecure"
+      - "traefik.http.routers.rust-api.tls=true"
       - "traefik.http.routers.rust-api.priority=10"
       - "traefik.http.middlewares.rust-strip.stripprefix.prefixes=/rust-api"
       - "traefik.http.routers.rust-api.middlewares=rust-strip"
@@ -80,6 +139,8 @@ services:
     environment:
       ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;
       JsonSeed__DataPath: /data
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: sample-api
     volumes:
       - sample-data:/data
     networks:
@@ -90,7 +151,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sample-api.rule=PathPrefix(`/sample-api`)"
-      - "traefik.http.routers.sample-api.entrypoints=web"
+      - "traefik.http.routers.sample-api.entrypoints=websecure"
+      - "traefik.http.routers.sample-api.tls=true"
       - "traefik.http.routers.sample-api.priority=10"
       - "traefik.http.middlewares.sample-strip.stripprefix.prefixes=/sample-api"
       - "traefik.http.routers.sample-api.middlewares=sample-strip"
@@ -105,7 +167,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
@@ -116,3 +179,6 @@ volumes:
   mysql-data:
   nest-data:
   sample-data:
+  tempo-data:
+  loki-data:
+  grafana-data:
