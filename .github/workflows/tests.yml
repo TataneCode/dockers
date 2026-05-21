@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: NestApi
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         working-directory: NestApi
@@ -50,7 +50,7 @@ jobs:
 
       - name: Run tests
         working-directory: RustApi
-        run: cargo test --locked
+        run: cargo test
 
   dotnet-api:
     name: DotnetApi
@@ -88,7 +88,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: sample-front
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         working-directory: sample-front
