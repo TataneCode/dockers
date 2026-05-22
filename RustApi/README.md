@@ -76,7 +76,7 @@ Available endpoints once running:
 |-----|-------------|
 | `http://localhost:3001/api/heroes` | Heroes CRUD |
 | `http://localhost:3001/api/powers` | Powers CRUD |
-| `http://localhost:3001/scalar` | Scalar OpenAPI UI |
+| `http://localhost:3001/docs` | Scalar OpenAPI UI |
 | `http://localhost:3001/openapi.json` | OpenAPI spec |
 
 ## Migrations
@@ -110,7 +110,7 @@ docker compose -f docker-compose.dev.yml up --build rust-api
 ### Release compose
 
 In `docker-compose.yml` the service is behind Traefik (HTTPS on port 4443) at the `/rust-api` prefix (stripped before forwarding).  
-Routes: `/rust-api/api/…`, `/rust-api/scalar`, `/rust-api/openapi.json`.
+Routes: `/rust-api/api/…`, `/rust-api/docs`, `/rust-api/openapi.json`.
 
 ```bash
 docker compose up --build rust-api

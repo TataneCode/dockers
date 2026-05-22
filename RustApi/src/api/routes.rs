@@ -10,7 +10,7 @@ pub fn build_router(state: AppState) -> Router {
     let hero_routes = Router::new()
         .route("/", get(heroes::get_all).post(heroes::create))
         .route(
-            "/:id",
+            "/{id}",
             get(heroes::get_by_id)
                 .put(heroes::update)
                 .delete(heroes::delete),
@@ -19,7 +19,7 @@ pub fn build_router(state: AppState) -> Router {
     let power_routes = Router::new()
         .route("/", get(powers::get_all).post(powers::create))
         .route(
-            "/:id",
+            "/{id}",
             get(powers::get_by_id)
                 .put(powers::update)
                 .delete(powers::delete),
@@ -35,7 +35,7 @@ pub fn build_router(state: AppState) -> Router {
 
     Router::new()
         .nest("/api", api_routes)
-        .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
+        .merge(Scalar::with_url("/docs", ApiDoc::openapi()))
         .route(
             "/openapi.json",
             get(|| async { axum::Json(ApiDoc::openapi()) }),

@@ -1,7 +1,7 @@
 # NestApi
 
 NestJS 11 backend for the Heroes & Powers application.  
-Uses **Prisma** for database access against a MySQL `nest_api` schema and exposes Swagger UI + OpenAPI.
+Uses **Prisma** for database access against a MySQL `nest_api` schema and exposes Scalar + OpenAPI.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ npm run start:dev
 |-----|-------------|
 | `http://localhost:3000/api/heroes` | Heroes CRUD |
 | `http://localhost:3000/api/powers` | Powers CRUD |
-| `http://localhost:3000/docs` | Swagger UI |
+| `http://localhost:3000/docs` | Scalar OpenAPI UI |
 | `http://localhost:3000/openapi/v1.json` | OpenAPI spec |
 
 Prisma migrations are applied automatically on startup via `prisma migrate deploy` (bundled in `start:prod`).  
@@ -54,4 +54,3 @@ docker compose up --build nest-api
 ```
 
 See the root `README.md` for the full stack startup and mkcert HTTPS setup.
-

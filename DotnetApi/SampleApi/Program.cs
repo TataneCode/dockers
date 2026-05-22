@@ -26,12 +26,6 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy =>
-        policy.WithOrigins("http://localhost:4200", "http://localhost:4208")
-              .AllowAnyHeader()
-              .AllowAnyMethod()));
-
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IHeroService, HeroService>();
 builder.Services.AddScoped<IPowerService, PowerService>();
@@ -39,13 +33,8 @@ builder.Services.AddScoped<ISeedService, SeedService>();
 
 var app = builder.Build();
 
-app.UseCors();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+app.MapOpenApi();
+app.MapScalarApiReference("/docs");
 
 app.MapHeroEndpoints();
 app.MapPowerEndpoints();

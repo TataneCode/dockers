@@ -119,7 +119,7 @@ npm run start:dev
 | URL | Description |
 |-----|-------------|
 | `http://localhost:3000/api/heroes` | Heroes CRUD |
-| `http://localhost:3000/docs` | Swagger UI |
+| `http://localhost:3000/docs` | Scalar OpenAPI UI |
 | `http://localhost:3000/openapi/v1.json` | OpenAPI spec |
 
 ### .NET backend
@@ -131,6 +131,7 @@ dotnet run --project DotnetApi/SampleApi/SampleApi.csproj
 | URL | Description |
 |-----|-------------|
 | `http://localhost:5025/api/heroes` | Heroes CRUD |
+| `http://localhost:5025/docs` | Scalar OpenAPI UI |
 | `http://localhost:5025/openapi/v1.json` | OpenAPI spec |
 
 ### Rust backend
@@ -143,7 +144,7 @@ cargo run
 | URL | Description |
 |-----|-------------|
 | `http://localhost:3001/api/heroes` | Heroes CRUD |
-| `http://localhost:3001/scalar` | Scalar OpenAPI UI |
+| `http://localhost:3001/docs` | Scalar OpenAPI UI |
 | `http://localhost:3001/openapi.json` | OpenAPI spec |
 
 ### Angular frontend
@@ -195,10 +196,11 @@ docker compose up --build
 |---------|-----|
 | Angular frontend | `https://localhost:4443/` |
 | NestJS API | `https://localhost:4443/api/` |
-| NestJS Swagger | `https://localhost:4443/docs` |
+| NestJS docs | `https://localhost:4443/docs` |
 | Rust API | `https://localhost:4443/rust-api/api/` |
-| Rust Scalar UI | `https://localhost:4443/rust-api/scalar` |
+| Rust docs | `https://localhost:4443/rust-api/docs` |
 | SampleApi | `https://localhost:4443/sample-api/api/` |
+| SampleApi docs | `https://localhost:4443/sample-api/docs` |
 | Grafana | `http://localhost:3000` *(admin / admin)* |
 
 TLS is terminated by Traefik using the mkcert certificate in `docker/certs/`.  

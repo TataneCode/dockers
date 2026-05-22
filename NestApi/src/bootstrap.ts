@@ -1,10 +1,9 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { apiReference } from '@scalar/nestjs-api-reference';
+import type { Request, Response } from 'express';
 
 export function configureApp(app: INestApplication): void {
-  app.enableCors({
-    origin: ['http://localhost:4200', 'http://localhost:4208'],
-  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -20,7 +19,15 @@ export function configureApp(app: INestApplication): void {
       .setVersion('1.0')
       .build(),
   );
-  SwaggerModule.setup('docs', app, document, {
-    jsonDocumentUrl: '/openapi/v1.json',
+
+  app.use('/openapi/v1.json', (_req: Request, res: Response) => {
+    res.json(document);
   });
+
+  app.use(
+    '/docs',
+    apiReference({
+      url: '/openapi/v1.json',
+    }),
+  );
 }

@@ -12,4 +12,4 @@ ENV ASPNETCORE_URLS=http://+:5025
 
 EXPOSE 5025
 
-ENTRYPOINT ["dotnet", "watch", "run", "--project", "SampleApi/SampleApi.csproj", "--no-hot-reload"]
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "SampleApi/SampleApi.csproj", "--no-hot-reload", "--no-launch-profile"]
