@@ -1,6 +1,6 @@
 # sample-front
 
-Angular 19 standalone frontend for the Heroes & Powers application.  
+Angular 22 standalone frontend for the Heroes & Powers application.  
 The dev server proxies `/api/*` to the selected backend via npm run scripts.
 
 ## Run locally
