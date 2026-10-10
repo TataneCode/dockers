@@ -2,8 +2,10 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import type { Request, Response } from 'express';
+import { serverTimingMiddleware } from './infrastructure/observability/server-timing.middleware';
 
 export function configureApp(app: INestApplication): void {
+  app.use(serverTimingMiddleware);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

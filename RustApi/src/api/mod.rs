@@ -1,4 +1,5 @@
 pub mod app_state;
+pub mod middleware;
 pub mod dto;
 pub mod error;
 pub mod handlers;

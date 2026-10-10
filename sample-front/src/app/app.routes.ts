@@ -19,6 +19,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/hero-detail/hero-detail.component').then(m => m.HeroDetailComponent),
   },
   {
+    path: 'benchmark',
+    loadComponent: () =>
+      import('./features/benchmark/benchmark.component').then(m => m.BenchmarkComponent),
+  },
+  {
     path: 'powers/new',
     loadComponent: () => import('./features/power-form/power-form.component').then(m => m.PowerFormComponent),
   },

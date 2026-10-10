@@ -24,6 +24,11 @@ import { PrismaService } from './prisma/prisma.service';
       useClass: PowersPrismaRepository,
     },
   ],
-  exports: [PrismaService, OtelLoggerService, HERO_REPOSITORY, POWER_REPOSITORY],
+  exports: [
+    PrismaService,
+    OtelLoggerService,
+    HERO_REPOSITORY,
+    POWER_REPOSITORY,
+  ],
 })
 export class InfrastructureModule {}

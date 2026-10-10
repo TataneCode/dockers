@@ -1,0 +1,265 @@
+{
+  "uid": "heroes-powers-benchmark",
+  "title": "Heroes & Powers — API Benchmark",
+  "tags": [
+    "heroes-powers",
+    "benchmark",
+    "otel"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Latence moyenne des requêtes HTTP (par backend)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "nest",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"nest-api\" && span.http.request.method } | avg(duration) by (span.http.request.method, span.url.path)"
+        },
+        {
+          "refId": "dotnet",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"sample-api\" && span.http.request.method } | avg(duration) by (span.http.request.method, span.url.path)"
+        },
+        {
+          "refId": "rust",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"rust-api\" && span.http.request.method } | avg(duration) by (span.http.request.method, span.url.path)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "p95 des requêtes HTTP (par backend)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "nest",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"nest-api\" && span.http.request.method } | quantile_over_time(0.95, duration) by (span.http.request.method)"
+        },
+        {
+          "refId": "dotnet",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"sample-api\" && span.http.request.method } | quantile_over_time(0.95, duration) by (span.http.request.method)"
+        },
+        {
+          "refId": "rust",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"rust-api\" && span.http.request.method } | quantile_over_time(0.95, duration) by (span.http.request.method)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Débit des requêtes HTTP (req/s, par backend)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "nest",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"nest-api\" && span.http.request.method } | rate() by (span.http.request.method)"
+        },
+        {
+          "refId": "dotnet",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"sample-api\" && span.http.request.method } | rate() by (span.http.request.method)"
+        },
+        {
+          "refId": "rust",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "json",
+          "expr": "{ resource.service.name = \"rust-api\" && span.http.request.method } | rate() by (span.http.request.method)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "traces",
+      "title": "Traces récentes (nest-api)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 0,
+        "y": 18
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "traceql",
+          "expr": "{ resource.service.name = \"nest-api\" }"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "traces",
+      "title": "Traces récentes (sample-api)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 8,
+        "y": 18
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "traceql",
+          "expr": "{ resource.service.name = \"sample-api\" }"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "traces",
+      "title": "Traces récentes (rust-api)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 18
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "traceql",
+          "expr": "{ resource.service.name = \"rust-api\" }"
+        }
+      ]
+    }
+  ]
+}

@@ -62,21 +62,19 @@ describe('HeroesService', () => {
     vi.clearAllMocks();
 
     heroRepository = {
-      findAll: vi.fn() as MockedFunction<HeroRepository['findAll']>,
-      findById: vi.fn() as MockedFunction<HeroRepository['findById']>,
-      create: vi.fn() as MockedFunction<HeroRepository['create']>,
-      update: vi.fn() as MockedFunction<HeroRepository['update']>,
-      remove: vi.fn() as MockedFunction<HeroRepository['remove']>,
+      findAll: vi.fn(),
+      findById: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      remove: vi.fn(),
     };
     powerRepository = {
-      findAll: vi.fn() as MockedFunction<PowerRepository['findAll']>,
-      findById: vi.fn() as MockedFunction<PowerRepository['findById']>,
-      create: vi.fn() as MockedFunction<PowerRepository['create']>,
-      update: vi.fn() as MockedFunction<PowerRepository['update']>,
-      remove: vi.fn() as MockedFunction<PowerRepository['remove']>,
-      findMissingIds: vi.fn() as MockedFunction<
-        PowerRepository['findMissingIds']
-      >,
+      findAll: vi.fn(),
+      findById: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      remove: vi.fn(),
+      findMissingIds: vi.fn(),
     };
 
     moduleRef = await Test.createTestingModule({
@@ -140,14 +138,14 @@ describe('HeroesService', () => {
   it('findById returns null when the hero does not exist', async () => {
     heroRepository.findById.mockResolvedValue(null);
 
-    await expect(service.findById('missing-hero')).resolves.toBeNull();
-    expect(heroRepository.findById).toHaveBeenCalledWith('missing-hero');
+    await expect(service.findById('missing-hero-id')).resolves.toBeNull();
+    expect(heroRepository.findById).toHaveBeenCalledWith('missing-hero-id');
   });
 
   it('create generates a new id and delegates to the repository', async () => {
     const hero = buildHero();
-    const createdHero = { ...hero, id: 'hero-id-123' };
-    randomUUIDMock.mockReturnValue('hero-id-123');
+    const createdHero = { ...hero, id: '123e4567-e89b-12d3-a456-426614174000' };
+    randomUUIDMock.mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
     powerRepository.findMissingIds.mockResolvedValue([]);
     heroRepository.create.mockResolvedValue(createdHero);
 
@@ -161,11 +159,11 @@ describe('HeroesService', () => {
     const hero = buildHero({
       powerIds: ['power-1', 'power-1', 'power-2', 'power-2'],
     });
-    randomUUIDMock.mockReturnValue('hero-id-123');
+    randomUUIDMock.mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
     powerRepository.findMissingIds.mockResolvedValue([]);
     heroRepository.create.mockResolvedValue({
       ...hero,
-      id: 'hero-id-123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       powerIds: ['power-1', 'power-2'],
     });
 
@@ -177,7 +175,7 @@ describe('HeroesService', () => {
     ]);
     expect(heroRepository.create).toHaveBeenCalledWith({
       ...hero,
-      id: 'hero-id-123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       powerIds: ['power-1', 'power-2'],
     });
   });
@@ -186,11 +184,11 @@ describe('HeroesService', () => {
     const hero = buildHero({
       powerIds: ['power-1', '', 'power-2', ''],
     });
-    randomUUIDMock.mockReturnValue('hero-id-123');
+    randomUUIDMock.mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
     powerRepository.findMissingIds.mockResolvedValue([]);
     heroRepository.create.mockResolvedValue({
       ...hero,
-      id: 'hero-id-123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       powerIds: ['power-1', 'power-2'],
     });
 
@@ -202,15 +200,15 @@ describe('HeroesService', () => {
     ]);
     expect(heroRepository.create).toHaveBeenCalledWith({
       ...hero,
-      id: 'hero-id-123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       powerIds: ['power-1', 'power-2'],
     });
   });
 
   it('create skips power validation when there are no power IDs', async () => {
     const hero = buildHero({ powerIds: [] });
-    const createdHero = { ...hero, id: 'hero-id-123' };
-    randomUUIDMock.mockReturnValue('hero-id-123');
+    const createdHero = { ...hero, id: '123e4567-e89b-12d3-a456-426614174000' };
+    randomUUIDMock.mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
     heroRepository.create.mockResolvedValue(createdHero);
 
     await expect(service.create(hero)).resolves.toEqual(createdHero);
@@ -236,11 +234,11 @@ describe('HeroesService', () => {
 
   it('update sets the provided id on the hero before delegating', async () => {
     const hero = buildHero({ powerIds: ['power-1', 'power-2'] });
-    const updatedHero = { ...hero, id: 'hero-id-123' };
+    const updatedHero = { ...hero, id: '123e4567-e89b-12d3-a456-426614174000' };
     powerRepository.findMissingIds.mockResolvedValue([]);
     heroRepository.update.mockResolvedValue(updatedHero);
 
-    await expect(service.update('hero-id-123', hero)).resolves.toEqual(
+    await expect(service.update('123e4567-e89b-12d3-a456-426614174000', hero)).resolves.toEqual(
       updatedHero,
     );
     expect(powerRepository.findMissingIds).toHaveBeenCalledWith([
@@ -255,10 +253,10 @@ describe('HeroesService', () => {
     powerRepository.findMissingIds.mockResolvedValue([]);
     heroRepository.update.mockResolvedValue(null);
 
-    await expect(service.update('missing-hero', hero)).resolves.toBeNull();
+    await expect(service.update('missing-hero-id', hero)).resolves.toBeNull();
     expect(heroRepository.update).toHaveBeenCalledWith({
       ...hero,
-      id: 'missing-hero',
+      id: 'missing-hero-id',
     });
   });
 
@@ -268,13 +266,13 @@ describe('HeroesService', () => {
     });
     const updatedHero = {
       ...hero,
-      id: 'hero-id-123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       powerIds: ['power-1', 'power-2'],
     };
     powerRepository.findMissingIds.mockResolvedValue([]);
     heroRepository.update.mockResolvedValue(updatedHero);
 
-    await service.update('hero-id-123', hero);
+    await service.update('123e4567-e89b-12d3-a456-426614174000', hero);
 
     expect(powerRepository.findMissingIds).toHaveBeenCalledWith([
       'power-1',
@@ -287,7 +285,7 @@ describe('HeroesService', () => {
     powerRepository.findMissingIds.mockResolvedValue(['power-2']);
 
     const updatePromise = service.update(
-      'hero-id-123',
+      '123e4567-e89b-12d3-a456-426614174000',
       buildHero({ powerIds: ['power-1', 'power-2'] }),
     );
 
@@ -310,7 +308,7 @@ describe('HeroesService', () => {
   it('remove returns false when the hero did not exist', async () => {
     heroRepository.remove.mockResolvedValue(false);
 
-    await expect(service.remove('missing-hero')).resolves.toBe(false);
-    expect(heroRepository.remove).toHaveBeenCalledWith('missing-hero');
+    await expect(service.remove('missing-hero-id')).resolves.toBe(false);
+    expect(heroRepository.remove).toHaveBeenCalledWith('missing-hero-id');
   });
 });

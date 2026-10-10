@@ -48,14 +48,12 @@ describe('PowersService', () => {
     vi.clearAllMocks();
 
     powerRepository = {
-      findAll: vi.fn() as MockedFunction<PowerRepository['findAll']>,
-      findById: vi.fn() as MockedFunction<PowerRepository['findById']>,
-      create: vi.fn() as MockedFunction<PowerRepository['create']>,
-      update: vi.fn() as MockedFunction<PowerRepository['update']>,
-      remove: vi.fn() as MockedFunction<PowerRepository['remove']>,
-      findMissingIds: vi.fn() as MockedFunction<
-        PowerRepository['findMissingIds']
-      >,
+      findAll: vi.fn(),
+      findById: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      remove: vi.fn(),
+      findMissingIds: vi.fn(),
     };
 
     moduleRef = await Test.createTestingModule({
@@ -121,8 +119,8 @@ describe('PowersService', () => {
 
   it('create generates a new id and delegates to the repository', async () => {
     const power = buildPower();
-    const createdPower = { ...power, id: 'power-id-123' };
-    randomUUIDMock.mockReturnValue('power-id-123');
+    const createdPower = { ...power, id: '123e4567-e89b-12d3-a456-426614174000' };
+    randomUUIDMock.mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
     powerRepository.create.mockResolvedValue(createdPower);
 
     await expect(service.create(power)).resolves.toEqual(createdPower);
@@ -132,10 +130,10 @@ describe('PowersService', () => {
 
   it('update sets the provided id on the power before delegating', async () => {
     const power = buildPower({ name: 'Telepathy', type: 'Mental', level: 8 });
-    const updatedPower = { ...power, id: 'power-id-123' };
+    const updatedPower = { ...power, id: '123e4567-e89b-12d3-a456-426614174000' };
     powerRepository.update.mockResolvedValue(updatedPower);
 
-    await expect(service.update('power-id-123', power)).resolves.toEqual(
+    await expect(service.update('123e4567-e89b-12d3-a456-426614174000', power)).resolves.toEqual(
       updatedPower,
     );
     expect(powerRepository.update).toHaveBeenCalledWith(updatedPower);

@@ -29,7 +29,10 @@ export class PowersController {
   constructor(private readonly powersService: PowersService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all powers', description: 'Returns a list of all powers.' })
+  @ApiOperation({
+    summary: 'Get all powers',
+    description: 'Returns a list of all powers.',
+  })
   @ApiOkResponse({ type: PowerResponseDto, isArray: true })
   async findAll(): Promise<PowerResponseDto[]> {
     return (await this.powersService.findAll()).map((power) =>
@@ -38,7 +41,10 @@ export class PowersController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a power by ID', description: 'Returns the power with the specified ID.' })
+  @ApiOperation({
+    summary: 'Get a power by ID',
+    description: 'Returns the power with the specified ID.',
+  })
   @ApiOkResponse({ type: PowerResponseDto })
   @ApiNotFoundResponse()
   async findOne(@Param('id') id: string): Promise<PowerResponseDto> {
@@ -51,7 +57,10 @@ export class PowersController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a power', description: 'Creates a new power and returns the created resource.' })
+  @ApiOperation({
+    summary: 'Create a power',
+    description: 'Creates a new power and returns the created resource.',
+  })
   @ApiCreatedResponse({ type: PowerResponseDto })
   async create(@Body() request: PowerRequestDto): Promise<PowerResponseDto> {
     const power = await this.powersService.create(
@@ -61,7 +70,10 @@ export class PowersController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update a power', description: 'Updates an existing power and returns the updated resource.' })
+  @ApiOperation({
+    summary: 'Update a power',
+    description: 'Updates an existing power and returns the updated resource.',
+  })
   @ApiOkResponse({ type: PowerResponseDto })
   @ApiNotFoundResponse()
   async update(
@@ -81,7 +93,10 @@ export class PowersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a power', description: 'Deletes the power with the specified ID.' })
+  @ApiOperation({
+    summary: 'Delete a power',
+    description: 'Deletes the power with the specified ID.',
+  })
   @ApiNoContentResponse()
   @ApiNotFoundResponse()
   async remove(@Param('id') id: string): Promise<void> {

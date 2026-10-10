@@ -40,5 +40,6 @@ pub fn build_router(state: AppState) -> Router {
             "/openapi.json",
             get(|| async { axum::Json(ApiDoc::openapi()) }),
         )
+        .layer(axum::middleware::from_fn(crate::api::middleware::server_timing))
         .with_state(state)
 }

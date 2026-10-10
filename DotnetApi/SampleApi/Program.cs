@@ -1,5 +1,6 @@
 using SampleApi.Endpoints;
 using SampleApi.Application.Services;
+using SampleApi.Middleware;
 using SampleApi.Infrastructure;
 using Scalar.AspNetCore;
 using OpenTelemetry.Logs;
@@ -9,10 +10,8 @@ using OpenTelemetry.Trace;
 var builder = WebApplication.CreateBuilder(args);
 
 var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]
-    ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
     ?? "http://localhost:4317";
 var serviceName = builder.Configuration["OTEL_SERVICE_NAME"]
-    ?? Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME")
     ?? "sample-api";
 
 builder.Services.AddOpenTelemetry()
@@ -32,6 +31,7 @@ builder.Services.AddScoped<IPowerService, PowerService>();
 builder.Services.AddScoped<ISeedService, SeedService>();
 
 var app = builder.Build();
+app.UseMiddleware<ServerTimingMiddleware>();
 
 app.MapOpenApi();
 app.MapScalarApiReference("/docs");
