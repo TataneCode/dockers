@@ -22,6 +22,8 @@ services:
       - "3002:3000"
     volumes:
       - otel-lgtm-data:/otel-lgtm
+      - ./docker/grafana/dashboards-provider.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/custom.yaml:ro
+      - ./docker/grafana/heroes-powers-benchmark.json:/otel-lgtm/grafana/conf/provisioning/dashboards/custom/heroes-powers-benchmark.json:ro
     networks:
       - app
 

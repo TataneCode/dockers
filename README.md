@@ -24,13 +24,11 @@ Full-stack sample application with an **Angular 22** frontend and three backend 
 ├── sample-front/   Angular 22 standalone frontend
 ├── docker/
 │   ├── certs/              mkcert certificates (git-ignored)
-│   ├── grafana/
-│   │   └── provisioning/   Grafana auto-provisioned datasources
-│   ├── loki/               Grafana Loki config
+│   ├── grafana/            Grafana dashboards + provisioning (otel-lgtm)
 │   ├── mysql/init/         MySQL init SQL scripts
-│   ├── otelcol/            OpenTelemetry Collector config
-│   ├── tempo/              Grafana Tempo config
 │   └── traefik/dynamic/    Traefik TLS dynamic config
+├── docs/
+│   └── observability.md   Observability & benchmark guide (Grafana, Tempo, Server-Timing)
 ├── archive/        Previous docker-compose files
 └── .vscode/        Workspace launch/tasks
 ```
@@ -158,13 +156,14 @@ npm install
 npm run start:nestapi    # proxy /api → localhost:3000 (NestApi)
 npm run start:rustapi    # proxy /api → localhost:3001 (RustApi)
 npm run start:sampleapi  # proxy /api → localhost:5025 (SampleApi)
+npm run start:benchmark  # proxy /api + /rust-api + /sample-api (benchmark des 3 backends)
 ```
 
 Frontend runs on `http://localhost:4200`.
 
 ## Run with Docker Compose — development
 
-Starts MySQL, all three APIs, and the monitoring stack. Ports are exposed for local frontend development.  
+Starts MySQL, all three APIs, and the otel-lgtm monitoring stack. Ports are exposed for local frontend development.  
 The Angular frontend is served separately with `npm run start:<api>`.
 
 ```bash
@@ -177,7 +176,7 @@ docker compose -f docker-compose.dev.yml up --build
 | NestApi | 3000 |
 | RustApi | 3001 |
 | SampleApi | 5025 |
-| Grafana | 3002 *(open, no login)* |
+| Grafana (otel-lgtm) | 3002 *(open, no login)* |
 
 > Grafana URL: `http://localhost:3002` — no credentials required in dev mode.
 
@@ -185,7 +184,7 @@ docker compose -f docker-compose.dev.yml up --build
 
 > **Requires the mkcert certificate** — see [HTTPS certificate setup](#https-certificate-setup-mkcert) above.
 
-Starts the full stack (DB + 3 APIs + Traefik + Angular frontend + monitoring stack).  
+Starts the full stack (DB + 3 APIs + Traefik + Angular frontend + otel-lgtm monitoring).  
 HTTP on port 4208 redirects automatically to HTTPS on port **4443**.
 
 ```bash
@@ -201,7 +200,7 @@ docker compose up --build
 | Rust docs | `https://localhost:4443/rust-api/docs` |
 | SampleApi | `https://localhost:4443/sample-api/api/` |
 | SampleApi docs | `https://localhost:4443/sample-api/docs` |
-| Grafana | `http://localhost:3000` *(admin / admin)* |
+| Grafana (otel-lgtm) | `http://localhost:3000` *(admin / admin)* |
 
 TLS is terminated by Traefik using the mkcert certificate in `docker/certs/`.  
 The dynamic TLS configuration is in `docker/traefik/dynamic/tls.yml`.
@@ -229,50 +228,15 @@ Compound configurations:
 | **Full Stack (.NET)** | Backend (dotnet) + Frontend (npm - SampleApi) |
 | **Full Stack (Rust)** | Backend (RustApi) + Frontend (npm - RustApi) |
 
-## Observability (traces & logs)
+## Observability & Benchmark
 
-All three backends are instrumented with **OpenTelemetry** and export traces and logs to a shared collector. The monitoring stack runs alongside the application services in both compose modes.
+All three backends are instrumented with **OpenTelemetry** and export traces and logs to the
+**grafana/otel-lgtm** all-in-one image (Loki, Grafana, Tempo, Prometheus). A Grafana dashboard
+comparing API execution times across backends is auto-provisioned, and the Angular frontend ships
+with a `/benchmark` page that triggers sequential calls to the three APIs and reports server-side
+durations (via the `Server-Timing` header).
 
-```
-App → OTel Collector (4317 gRPC) → Tempo (traces)
-                                 → Loki  (logs)
-                                        ↓
-                                   Grafana :3000
-```
-
-### Components
-
-| Service | Image | Purpose |
-|---------|-------|---------|
-| `otelcol` | `otel/opentelemetry-collector-contrib` | Receives OTLP, fans out to Tempo + Loki |
-| `tempo` | `grafana/tempo` | Distributed trace storage |
-| `loki` | `grafana/loki` | Log aggregation |
-| `grafana` | `grafana/grafana` | Dashboards, Explore, trace↔log correlation |
-
-Datasources (Tempo and Loki) are auto-provisioned — no manual setup needed.
-
-### Accessing Grafana
-
-| Mode | URL | Auth |
-|------|-----|------|
-| Dev | `http://localhost:3002` | None — anonymous admin access |
-| Release | `http://localhost:3000` | `admin` / `admin` |
-
-### Comparing API execution times
-
-1. Open Grafana → **Explore**
-2. Select the **Tempo** datasource
-3. Use **Search** tab, filter by `service.name`: `nest-api`, `rust-api`, or `sample-api`
-4. Click any trace to see per-span durations (HTTP handler, DB query, etc.)
-5. Use the **Logs** link on a span to jump directly to the correlated Loki logs
-
-### API instrumentation details
-
-| Backend | Traces | Logs |
-|---------|--------|------|
-| NestJS | `@opentelemetry/auto-instrumentations-node` | `OTLPLogExporter` via `BatchLogRecordProcessor` |
-| Rust/Axum | `tracing-opentelemetry` layer | `opentelemetry-appender-tracing` bridges `tracing` events |
-| .NET | `AddAspNetCoreInstrumentation()` | `ILogger` → `AddOtlpExporter()` |
+➡️ Full guide: [docs/observability.md](docs/observability.md)
 
 ## Build & validate
 
