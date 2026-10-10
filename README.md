@@ -153,11 +153,15 @@ Run with the desired backend proxy:
 cd sample-front
 npm install
 
-npm run start:nestapi    # proxy /api → localhost:3000 (NestApi)
-npm run start:rustapi    # proxy /api → localhost:3001 (RustApi)
-npm run start:sampleapi  # proxy /api → localhost:5025 (SampleApi)
+npm run start:nestapi    # proxy /api → localhost:5180 (NestApi)
+npm run start:rustapi    # proxy /api → localhost:5181 (RustApi)
+npm run start:sampleapi  # proxy /api → localhost:5182 (SampleApi)
 npm run start:benchmark  # proxy /api + /rust-api + /sample-api (benchmark des 3 backends)
 ```
+
+The proxy targets (`5180` / `5181` / `5182`) match the ports published by the Docker dev stack
+(`docker-compose.dev.yml`). When running a backend natively instead, its own port applies
+(3000 for NestApi and RustApi, 5025 for SampleApi).
 
 Frontend runs on `http://localhost:4200`.
 
@@ -173,12 +177,12 @@ docker compose -f docker-compose.dev.yml up --build
 | Service | Host port |
 |---------|-----------|
 | MySQL | 3306 |
-| NestApi | 3000 |
-| RustApi | 3001 |
-| SampleApi | 5025 |
-| Grafana (otel-lgtm) | 3002 *(open, no login)* |
+| NestApi | 5180 |
+| RustApi | 5181 |
+| SampleApi | 5182 |
+| Grafana (otel-lgtm) | 3000 *(open, no login)* |
 
-> Grafana URL: `http://localhost:3002` — no credentials required in dev mode.
+> Grafana URL: `http://localhost:3000` — no credentials required in dev mode.
 
 ## Run with Docker Compose — release
 
@@ -216,9 +220,9 @@ Root `.vscode/launch.json` provides the following configurations:
 | **Backend (dotnet)** | Starts SampleApi with the .NET debugger |
 | **Backend (Docker debug)** | Builds + runs SampleApi debug container with vsdbg |
 | **Backend (RustApi)** | Starts RustApi via `cargo run` |
-| **Frontend (npm - NestApi)** | Angular dev server proxied to NestApi (port 3000) |
-| **Frontend (npm - RustApi)** | Angular dev server proxied to RustApi (port 3001) |
-| **Frontend (npm - SampleApi)** | Angular dev server proxied to SampleApi (port 5025) |
+| **Frontend (npm - NestApi)** | Angular dev server proxied to NestApi (port 5180) |
+| **Frontend (npm - RustApi)** | Angular dev server proxied to RustApi (port 5181) |
+| **Frontend (npm - SampleApi)** | Angular dev server proxied to SampleApi (port 5182) |
 
 Compound configurations:
 

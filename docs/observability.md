@@ -33,7 +33,7 @@ Datasources et dashboards sont **auto-provisionnés** — aucune configuration m
 
 | Mode compose | URL | Auth |
 |--------------|-----|------|
-| Dev (`docker-compose.dev.yml`) | `http://localhost:3002` | Aucune — accès anonyme Admin |
+| Dev (`docker-compose.dev.yml`) | `http://localhost:3000` | Aucune — accès anonyme Admin |
 | Release (`docker-compose.yml`) | `http://localhost:3000` | `admin` / `admin` |
 
 L'image active par défaut l'authentification anonyme avec rôle Admin (`GF_AUTH_ANONYMOUS_ENABLED=true`).
@@ -97,7 +97,8 @@ backends et restitue les temps d'exécution **serveur** (header [`Server-Timing`
 
 > En dev local (hors Traefik), lancer le front avec `npm run start:benchmark` — le proxy
 > `proxy.conf.benchmark.json` route `/api` (Nest), `/rust-api` (Rust) et `/sample-api` (.NET)
-> vers les ports 3000 / 3001 / 5025.
+> vers les ports 5180 / 5181 / 5182 (préfixes `/rust-api` et `/sample-api` retirés via
+> `pathRewrite`, comme le fait Traefik en release).
 
 ### Implémentation du header Server-Timing
 

@@ -8,9 +8,9 @@ The dev server proxies `/api/*` to the selected backend via npm run scripts.
 ```bash
 npm install
 
-npm run start:nestapi    # proxy /api → localhost:3000  (NestApi)
-npm run start:rustapi    # proxy /api → localhost:3001  (RustApi)
-npm run start:sampleapi  # proxy /api → localhost:5025  (SampleApi)
+npm run start:nestapi    # proxy /api → localhost:5180  (NestApi)
+npm run start:rustapi    # proxy /api → localhost:5181  (RustApi)
+npm run start:sampleapi  # proxy /api → localhost:5182  (SampleApi)
 ```
 
 Open `http://localhost:4200` in your browser.
@@ -19,9 +19,9 @@ Each script uses a dedicated proxy config:
 
 | Script | Proxy config | Target |
 |--------|-------------|--------|
-| `start:nestapi` | `proxy.conf.json` | `http://localhost:3000` |
-| `start:rustapi` | `proxy.conf.rustapi.json` | `http://localhost:3001` |
-| `start:sampleapi` | `proxy.conf.sampleapi.json` | `http://localhost:5025` |
+| `start:nestapi` | `proxy.conf.json` | `http://localhost:5180` |
+| `start:rustapi` | `proxy.conf.rustapi.json` | `http://localhost:5181` |
+| `start:sampleapi` | `proxy.conf.sampleapi.json` | `http://localhost:5182` |
 
 ## Build
 

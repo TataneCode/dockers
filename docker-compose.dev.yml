@@ -19,7 +19,7 @@ services:
   otel-lgtm:
     image: grafana/otel-lgtm:latest
     ports:
-      - "3002:3000"
+      - "3000:3000"
     volumes:
       - otel-lgtm-data:/otel-lgtm
       - ./docker/grafana/dashboards-provider.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/custom.yaml:ro
@@ -32,7 +32,7 @@ services:
       context: ./NestApi
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "5180:3000"
     environment:
       PORT: 3000
       DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/nest_api
@@ -52,7 +52,7 @@ services:
       context: ./RustApi
       dockerfile: Dockerfile
     ports:
-      - "3001:3000"
+      - "5181:3000"
     environment:
       PORT: 3000
       DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/rust_api
@@ -72,7 +72,7 @@ services:
       context: ./DotnetApi
       dockerfile: SampleApi/Dockerfile.dev
     ports:
-      - "5025:5025"
+      - "5182:5025"
     environment:
       ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;
       JsonSeed__DataPath: /data
