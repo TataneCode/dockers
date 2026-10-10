@@ -8,6 +8,7 @@ import {
   type BenchmarkEndpoint,
   type BenchmarkRunResult,
 } from '../../core/api/benchmark-api.service';
+import { computeTimingStats } from '../../core/api/timing';
 
 const endpoint: BenchmarkEndpoint = {
   label: 'GET /heroes',
@@ -77,9 +78,9 @@ describe('BenchmarkComponent', () => {
   });
 });
 
-describe('BenchmarkApiService.stats', () => {
+describe('computeTimingStats', () => {
   it('computes min/avg/p95/max', () => {
-    expect(BenchmarkApiService.stats([10, 20, 30, 40, 100])).toEqual({
+    expect(computeTimingStats([10, 20, 30, 40, 100])).toEqual({
       min: 10,
       avg: 40,
       p95: 100,
@@ -88,6 +89,6 @@ describe('BenchmarkApiService.stats', () => {
   });
 
   it('returns null for empty durations', () => {
-    expect(BenchmarkApiService.stats([])).toBeNull();
+    expect(computeTimingStats([])).toBeNull();
   });
 });

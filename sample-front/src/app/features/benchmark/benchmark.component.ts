@@ -1,22 +1,21 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   BenchmarkApiService,
   BACKENDS,
   BENCHMARK_ENDPOINTS,
-  BenchmarkRunResult,
-  BenchmarkStats,
   type BackendKey,
+  type BenchmarkRunResult,
 } from '../../core/api/benchmark-api.service';
+import { computeTimingStats, type TimingStats } from '../../core/api/timing';
 
 interface BackendResultView {
   key: BackendKey;
   label: string;
   running: boolean;
   error?: string;
-  stats: BenchmarkStats | null;
+  stats: TimingStats | null;
   samples: number;
 }
 
@@ -45,7 +44,7 @@ export class BenchmarkComponent {
     const inProgress = this.inProgress();
     return this.backends.map((backend) => {
       const result = current[backend.key];
-      const stats = result ? BenchmarkApiService.stats(result.serverDurationsMs) : null;
+      const stats = result ? computeTimingStats(result.serverDurationsMs) : null;
       return {
         key: backend.key,
         label: backend.label,
