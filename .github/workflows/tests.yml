@@ -2,6 +2,7 @@ name: Tests
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -9,8 +10,41 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect changed projects
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      nest: ${{ steps.filter.outputs.nest }}
+      rust: ${{ steps.filter.outputs.rust }}
+      dotnet: ${{ steps.filter.outputs.dotnet }}
+      front: ${{ steps.filter.outputs.front }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Filter paths
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            nest:
+              - 'NestApi/**'
+            rust:
+              - 'RustApi/**'
+            dotnet:
+              - 'DotnetApi/**'
+            front:
+              - 'sample-front/**'
+            workflow:
+              - '.github/workflows/tests.yml'
+
   nest-api:
     name: NestApi
+    needs: changes
+    if: ${{ needs.changes.outputs.nest == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -26,7 +60,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: NestApi
-        run: npm install
+        run: npm ci
 
       - name: Run tests
         working-directory: NestApi
@@ -34,6 +68,8 @@ jobs:
 
   rust-api:
     name: RustApi
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -54,6 +90,8 @@ jobs:
 
   dotnet-api:
     name: DotnetApi
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -73,6 +111,8 @@ jobs:
 
   front-office:
     name: Front office
+    needs: changes
+    if: ${{ needs.changes.outputs.front == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -88,7 +128,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: sample-front
-        run: npm install
+        run: npm ci
+
+      - name: Build
+        working-directory: sample-front
+        run: npm run build
 
       - name: Run tests
         working-directory: sample-front

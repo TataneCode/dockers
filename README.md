@@ -1,6 +1,6 @@
 # Heroes & Powers
 
-Full-stack sample application with an **Angular 19** frontend and three backend implementations that expose the same Heroes & Powers REST API.
+Full-stack sample application with an **Angular 22** frontend and three backend implementations that expose the same Heroes & Powers REST API.
 
 | Directory | Stack | DB schema |
 |-----------|-------|-----------|
@@ -21,7 +21,7 @@ Full-stack sample application with an **Angular 19** frontend and three backend 
 │   ├── SampleApi.Infrastructure/
 │   └── sample-back.slnx
 ├── RustApi/        Rust (Axum + SQLx) backend
-├── sample-front/   Angular 19 standalone frontend
+├── sample-front/   Angular 22 standalone frontend
 ├── docker/
 │   ├── certs/              mkcert certificates (git-ignored)
 │   ├── grafana/
