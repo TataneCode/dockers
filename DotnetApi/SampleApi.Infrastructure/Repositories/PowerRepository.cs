@@ -85,9 +85,9 @@ public sealed class PowerRepository(SampleApiDbContext dbContext) : IPowerReposi
         var requestedIds = ids
             .Where(id => !string.IsNullOrWhiteSpace(id))
             .Distinct(StringComparer.Ordinal)
-            .ToArray();
+            .ToList();
 
-        if (requestedIds.Length == 0)
+        if (requestedIds.Count == 0)
         {
             return [];
         }
