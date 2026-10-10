@@ -1,0 +1,74 @@
+<section class="benchmark">
+  <h1>Benchmark</h1>
+  <p class="subtitle">
+    Compare le temps d'exécution serveur (header <code>Server-Timing</code>) des trois backends.
+  </p>
+
+  <form class="controls" (ngSubmit)="runBenchmark()">
+    <label>
+      Endpoint
+      <select [(ngModel)]="selectedEndpointIndex" name="endpoint" [disabled]="running()">
+        @for (endpoint of endpoints; track endpoint.label) {
+          <option [value]="$index">{{ endpoint.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Itérations
+      <select [(ngModel)]="iterations" name="iterations" [disabled]="running()">
+        @for (choice of iterationChoices; track choice) {
+          <option [ngValue]="choice">{{ choice }}</option>
+        }
+      </select>
+    </label>
+
+    <button type="submit" [disabled]="running()">
+      {{ running() ? 'En cours…' : 'Lancer le benchmark' }}
+    </button>
+  </form>
+
+  @if (running()) {
+    <p class="status">Exécution séquentielle des appels…</p>
+  }
+
+  <table class="results">
+    <thead>
+      <tr>
+        <th>Backend</th>
+        <th>Échantillons</th>
+        <th>Min (ms)</th>
+        <th>Moyenne (ms)</th>
+        <th>p95 (ms)</th>
+        <th>Max (ms)</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (view of resultViews(); track view.key) {
+        <tr [class.running]="view.running">
+          <td>{{ view.label }}</td>
+          <td>{{ view.samples }}</td>
+          @if (view.stats; as stats) {
+            <td>{{ stats.min | number: '1.1-1' }}</td>
+            <td>{{ stats.avg | number: '1.1-1' }}</td>
+            <td>{{ stats.p95 | number: '1.1-1' }}</td>
+            <td>{{ stats.max | number: '1.1-1' }}</td>
+            <td class="ok">OK</td>
+          } @else {
+            <td colspan="5">
+              @if (view.error) {
+                <span class="error">{{ view.error }}</span>
+              } @else if (view.running) {
+                <span class="status">en cours…</span>
+              } @else {
+                <span class="status">—</span>
+              }
+            </td>
+            <td></td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

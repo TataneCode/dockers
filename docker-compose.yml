@@ -35,50 +35,14 @@ services:
     networks:
       - app
 
-  otelcol:
-    image: otel/opentelemetry-collector-contrib:latest
-    command: ["--config=/etc/otelcol-contrib/config.yaml"]
-    volumes:
-      - ./docker/otelcol/config.yaml:/etc/otelcol-contrib/config.yaml:ro
-    networks:
-      - app
-    depends_on:
-      - tempo
-      - loki
-
-  tempo:
-    image: grafana/tempo:latest
-    command: ["-config.file=/etc/tempo/config.yaml"]
-    volumes:
-      - ./docker/tempo/config.yaml:/etc/tempo/config.yaml:ro
-      - tempo-data:/var/tempo
-    networks:
-      - app
-
-  loki:
-    image: grafana/loki:latest
-    command: ["-config.file=/etc/loki/config.yaml"]
-    volumes:
-      - ./docker/loki/config.yaml:/etc/loki/config.yaml:ro
-      - loki-data:/loki
-    networks:
-      - app
-
-  grafana:
-    image: grafana/grafana:latest
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
     ports:
       - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
-      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
-      - grafana-data:/var/lib/grafana
+      - otel-lgtm-data:/otel-lgtm
     networks:
       - app
-    depends_on:
-      - tempo
-      - loki
 
   nest-api:
     build:
@@ -88,7 +52,7 @@ services:
       PORT: 3000
       DATABASE_URL: mysql://heroes_app:heroes_app@mysql:3306/nest_api
       JSON_SEED_DATA_PATH: /app/.data
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-lgtm:4317
       OTEL_SERVICE_NAME: nest-api
     volumes:
       - nest-data:/app/.data
@@ -115,7 +79,7 @@ services:
       JSON_SEED_ENABLED: "true"
       JSON_SEED_DATA_PATH: /app/.data
       RUST_LOG: rust_api=info
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-lgtm:4317
       OTEL_SERVICE_NAME: rust-api
     networks:
       - app
@@ -139,7 +103,7 @@ services:
     environment:
       ConnectionStrings__SampleApiDatabase: Server=mysql;Port=3306;Database=sample_api;User=heroes_app;Password=heroes_app;
       JsonSeed__DataPath: /data
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-lgtm:4317
       OTEL_SERVICE_NAME: sample-api
     volumes:
       - sample-data:/data
@@ -179,6 +143,4 @@ volumes:
   mysql-data:
   nest-data:
   sample-data:
-  tempo-data:
-  loki-data:
-  grafana-data:
+  otel-lgtm-data:

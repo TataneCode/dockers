@@ -1,5 +1,6 @@
 using SampleApi.Endpoints;
 using SampleApi.Application.Services;
+using SampleApi.Middleware;
 using SampleApi.Infrastructure;
 using Scalar.AspNetCore;
 using OpenTelemetry.Logs;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<IPowerService, PowerService>();
 builder.Services.AddScoped<ISeedService, SeedService>();
 
 var app = builder.Build();
+app.UseMiddleware<ServerTimingMiddleware>();
 
 app.MapOpenApi();
 app.MapScalarApiReference("/docs");

@@ -9,7 +9,8 @@
     "start:sampleapi": "ng serve --proxy-config proxy.conf.sampleapi.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test --watch=false"
+    "test": "ng test --watch=false",
+    "start:benchmark": "ng serve --proxy-config proxy.conf.benchmark.json"
   },
   "private": true,
   "dependencies": {
