@@ -5,33 +5,96 @@ import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 @Injectable()
 export class SeedService {
   private static readonly POWER_PREFIXES = [
-    'Flame', 'Ice', 'Shadow', 'Lightning', 'Stone',
-    'Wind', 'Void', 'Solar', 'Dark', 'Aqua', 'Iron', 'Psychic',
+    'Flame',
+    'Ice',
+    'Shadow',
+    'Lightning',
+    'Stone',
+    'Wind',
+    'Void',
+    'Solar',
+    'Dark',
+    'Aqua',
+    'Iron',
+    'Psychic',
   ];
   private static readonly POWER_SUFFIXES = [
-    'Strike', 'Shield', 'Burst', 'Wave', 'Blast',
-    'Pulse', 'Surge', 'Slam', 'Ray', 'Aura',
+    'Strike',
+    'Shield',
+    'Burst',
+    'Wave',
+    'Blast',
+    'Pulse',
+    'Surge',
+    'Slam',
+    'Ray',
+    'Aura',
   ];
-  private static readonly POWER_TYPES = ['Physical', 'Mental', 'Elemental', 'Tech'];
+  private static readonly POWER_TYPES = [
+    'Physical',
+    'Mental',
+    'Elemental',
+    'Tech',
+  ];
   private static readonly HERO_FIRST_NAMES = [
-    'Alex', 'Maya', 'Jordan', 'Sam', 'Riley',
-    'Morgan', 'Casey', 'Quinn', 'Skyler', 'Drake',
+    'Alex',
+    'Maya',
+    'Jordan',
+    'Sam',
+    'Riley',
+    'Morgan',
+    'Casey',
+    'Quinn',
+    'Skyler',
+    'Drake',
   ];
   private static readonly HERO_LAST_NAMES = [
-    'Rivers', 'Storm', 'Blaze', 'Shield', 'Arrow',
-    'Night', 'Star', 'Hunter', 'Cross', 'Steele',
+    'Rivers',
+    'Storm',
+    'Blaze',
+    'Shield',
+    'Arrow',
+    'Night',
+    'Star',
+    'Hunter',
+    'Cross',
+    'Steele',
   ];
   private static readonly ALIAS_ADJECTIVES = [
-    'Mighty', 'Dark', 'Iron', 'Swift', 'Blazing',
-    'Fearless', 'Silent', 'Cosmic', 'Raging', 'Steel',
+    'Mighty',
+    'Dark',
+    'Iron',
+    'Swift',
+    'Blazing',
+    'Fearless',
+    'Silent',
+    'Cosmic',
+    'Raging',
+    'Steel',
   ];
   private static readonly ALIAS_NOUNS = [
-    'Falcon', 'Tiger', 'Phoenix', 'Wolf', 'Dragon',
-    'Eagle', 'Shark', 'Panther', 'Viper', 'Hawk',
+    'Falcon',
+    'Tiger',
+    'Phoenix',
+    'Wolf',
+    'Dragon',
+    'Eagle',
+    'Shark',
+    'Panther',
+    'Viper',
+    'Hawk',
   ];
   private static readonly ORIGINS = [
-    'New York City', 'Metropolis', 'Gotham City', 'Star City', 'Central City',
-    'Coast City', 'Keystone City', 'Hub City', 'Midway City', 'Gateway City',
+    'New York City',
+    'Metropolis',
+    'Gotham City',
+    'Star City',
+    'Central City',
+    'Coast City',
+    'Keystone City',
+    'Hub City',
+    'Midway City',
+    'Gateway City',
   ];
 
   constructor(private readonly prisma: PrismaService) {}

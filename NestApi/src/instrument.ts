@@ -4,7 +4,8 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 
-const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://localhost:4317';
+const otlpEndpoint =
+  process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://localhost:4317';
 
 const sdk = new NodeSDK({
   serviceName: process.env.OTEL_SERVICE_NAME ?? 'nest-api',

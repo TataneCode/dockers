@@ -6,9 +6,9 @@ const emit = vi.fn();
 const enabled = vi.fn();
 
 vi.mock('@opentelemetry/api-logs', async () => {
-  const actual = await vi.importActual<typeof import('@opentelemetry/api-logs')>(
-    '@opentelemetry/api-logs',
-  );
+  const actual = await vi.importActual<
+    typeof import('@opentelemetry/api-logs')
+  >('@opentelemetry/api-logs');
 
   return {
     ...actual,
@@ -27,7 +27,9 @@ describe('OtelLoggerService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     enabled.mockReturnValue(true);
-    vi.spyOn(ConsoleLogger.prototype, 'log').mockImplementation(() => undefined);
+    vi.spyOn(ConsoleLogger.prototype, 'log').mockImplementation(
+      () => undefined,
+    );
     vi.spyOn(ConsoleLogger.prototype, 'error').mockImplementation(
       () => undefined,
     );

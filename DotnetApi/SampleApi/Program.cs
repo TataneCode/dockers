@@ -10,10 +10,8 @@ using OpenTelemetry.Trace;
 var builder = WebApplication.CreateBuilder(args);
 
 var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]
-    ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
     ?? "http://localhost:4317";
 var serviceName = builder.Configuration["OTEL_SERVICE_NAME"]
-    ?? Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME")
     ?? "sample-api";
 
 builder.Services.AddOpenTelemetry()

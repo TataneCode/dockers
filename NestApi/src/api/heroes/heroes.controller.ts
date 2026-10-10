@@ -32,7 +32,10 @@ export class HeroesController {
   constructor(private readonly heroesService: HeroesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all heroes', description: 'Returns a list of all heroes.' })
+  @ApiOperation({
+    summary: 'Get all heroes',
+    description: 'Returns a list of all heroes.',
+  })
   @ApiOkResponse({ type: HeroResponseDto, isArray: true })
   async findAll(): Promise<HeroResponseDto[]> {
     return (await this.heroesService.findAll()).map((hero) =>
@@ -41,7 +44,10 @@ export class HeroesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a hero by ID', description: 'Returns the hero with the specified ID.' })
+  @ApiOperation({
+    summary: 'Get a hero by ID',
+    description: 'Returns the hero with the specified ID.',
+  })
   @ApiOkResponse({ type: HeroResponseDto })
   @ApiNotFoundResponse()
   async findOne(@Param('id') id: string): Promise<HeroResponseDto> {
@@ -54,7 +60,10 @@ export class HeroesController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a hero', description: 'Creates a new hero and returns the created resource.' })
+  @ApiOperation({
+    summary: 'Create a hero',
+    description: 'Creates a new hero and returns the created resource.',
+  })
   @ApiCreatedResponse({ type: HeroResponseDto })
   @ApiUnprocessableEntityResponse({ description: 'Invalid power references' })
   async create(@Body() request: HeroRequestDto): Promise<HeroResponseDto> {
@@ -69,7 +78,10 @@ export class HeroesController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update a hero', description: 'Updates an existing hero and returns the updated resource.' })
+  @ApiOperation({
+    summary: 'Update a hero',
+    description: 'Updates an existing hero and returns the updated resource.',
+  })
   @ApiOkResponse({ type: HeroResponseDto })
   @ApiNotFoundResponse()
   @ApiUnprocessableEntityResponse({ description: 'Invalid power references' })
@@ -94,7 +106,10 @@ export class HeroesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a hero', description: 'Deletes the hero with the specified ID.' })
+  @ApiOperation({
+    summary: 'Delete a hero',
+    description: 'Deletes the hero with the specified ID.',
+  })
   @ApiNoContentResponse()
   @ApiNotFoundResponse()
   async remove(@Param('id') id: string): Promise<void> {

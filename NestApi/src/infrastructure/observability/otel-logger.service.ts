@@ -99,8 +99,7 @@ export class OtelLoggerService extends ConsoleLogger {
         ? this.normalizeErrorPayload(optionalParams)
         : this.normalizePayload(optionalParams);
 
-    const error =
-      message instanceof Error ? message : undefined;
+    const error = message instanceof Error ? message : undefined;
     const attributes: LogAttributes = {
       'nestjs.level': level,
     };
@@ -130,8 +129,7 @@ export class OtelLoggerService extends ConsoleLogger {
 
   private normalizePayload(optionalParams: unknown[]): NormalizedLogPayload {
     const lastParam = optionalParams.at(-1);
-    const context =
-      typeof lastParam === 'string' ? lastParam : this.context;
+    const context = typeof lastParam === 'string' ? lastParam : this.context;
 
     return {
       context,
@@ -142,7 +140,9 @@ export class OtelLoggerService extends ConsoleLogger {
     };
   }
 
-  private normalizeErrorPayload(optionalParams: unknown[]): NormalizedLogPayload {
+  private normalizeErrorPayload(
+    optionalParams: unknown[],
+  ): NormalizedLogPayload {
     if (optionalParams.length === 0) {
       return {
         context: this.context,
