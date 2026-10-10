@@ -9,7 +9,7 @@
       Endpoint
       <select [(ngModel)]="selectedEndpointIndex" name="endpoint" [disabled]="running()">
         @for (endpoint of endpoints; track endpoint.label) {
-          <option [value]="$index">{{ endpoint.label }}</option>
+          <option [ngValue]="$index">{{ endpoint.label }}</option>
         }
       </select>
     </label>

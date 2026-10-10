@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 export type BackendKey = 'nest' | 'dotnet' | 'rust';
@@ -76,7 +76,12 @@ export class BenchmarkApiService {
           serverDurationsMs.push(duration);
         }
       } catch (e) {
-        error = e instanceof Error ? e.message : String(e);
+        error =
+          e instanceof HttpErrorResponse
+            ? `HTTP ${e.status} ${e.statusText}`.trim()
+            : e instanceof Error
+              ? e.message
+              : String(e);
         break;
       }
     }

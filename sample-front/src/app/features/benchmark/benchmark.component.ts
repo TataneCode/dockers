@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   BenchmarkApiService,
   BACKENDS,
@@ -13,7 +14,6 @@ import {
 interface BackendResultView {
   key: BackendKey;
   label: string;
-  done: boolean;
   running: boolean;
   error?: string;
   stats: BenchmarkStats | null;
@@ -35,27 +35,27 @@ export class BenchmarkComponent {
 
   selectedEndpointIndex = 0;
   iterations = 10;
+
   readonly running = signal(false);
   private readonly results = signal<Record<string, BenchmarkRunResult>>({});
+  private readonly inProgress = signal<BackendKey | null>(null);
 
   readonly resultViews = computed<BackendResultView[]>(() => {
     const current = this.results();
+    const inProgress = this.inProgress();
     return this.backends.map((backend) => {
       const result = current[backend.key];
       const stats = result ? BenchmarkApiService.stats(result.serverDurationsMs) : null;
       return {
         key: backend.key,
         label: backend.label,
-        done: !!result && !result.error,
-        running: this.running() && result === undefined && this.inProgress === backend.key,
+        running: this.running() && inProgress === backend.key,
         error: result?.error,
         stats,
         samples: result?.serverDurationsMs.length ?? 0,
       };
     });
   });
-
-  private inProgress: BackendKey | null = null;
 
   async runBenchmark(): Promise<void> {
     if (this.running()) {
@@ -64,14 +64,15 @@ export class BenchmarkComponent {
     const endpoint = this.endpoints[this.selectedEndpointIndex];
     this.running.set(true);
     this.results.set({});
+    this.inProgress.set(this.backends[0].key);
     try {
       for (const backend of this.backends) {
-        this.inProgress = backend.key;
+        this.inProgress.set(backend.key);
         const result = await this.benchmarkApi.run(backend, endpoint, this.iterations);
         this.results.update((prev) => ({ ...prev, [backend.key]: result }));
       }
     } finally {
-      this.inProgress = null;
+      this.inProgress.set(null);
       this.running.set(false);
     }
   }
