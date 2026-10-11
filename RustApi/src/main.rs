@@ -5,6 +5,7 @@ mod application;
 mod config;
 mod domain;
 mod infrastructure;
+mod observability;
 
 use api::app_state::AppState;
 use api::routes::build_router;
@@ -62,6 +63,7 @@ async fn main() {
 
     let tracer_provider = init_tracer_provider(&otlp_endpoint);
     let logger_provider = init_logger_provider(&otlp_endpoint);
+    let meter_provider = observability::process_metrics::init_meter_provider(&otlp_endpoint);
 
     global::set_tracer_provider(tracer_provider.clone());
 
@@ -114,4 +116,5 @@ async fn main() {
 
     let _ = tracer_provider.shutdown();
     let _ = logger_provider.shutdown();
+    let _ = meter_provider.shutdown();
 }

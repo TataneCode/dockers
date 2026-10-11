@@ -1,0 +1,72 @@
+<section class="results-page">
+  <h1>Seed</h1>
+  <p class="subtitle">
+    Crée aléatoirement des héros et 1 à 3 pouvoirs chacun sur les trois backends,
+    en passant uniquement par le front (<code>POST /powers</code> puis <code>POST /heroes</code>).
+  </p>
+
+  <form class="controls" (ngSubmit)="runSeed()">
+    <label>
+      Héros
+      <select [(ngModel)]="heroCount" name="heroCount" [disabled]="running()">
+        @for (choice of heroChoices; track choice) {
+          <option [ngValue]="choice">{{ choice }}</option>
+        }
+      </select>
+    </label>
+
+    <button type="submit" [disabled]="running()">
+      {{ running() ? 'En cours…' : 'Lancer le seed' }}
+    </button>
+  </form>
+
+  @if (running()) {
+    <p class="status">Création séquentielle sur les backends…</p>
+  }
+
+  <table class="results">
+    <thead>
+      <tr>
+        <th>Backend</th>
+        <th>Héros créés</th>
+        <th>Pouvoirs créés</th>
+        <th>Appels</th>
+        <th>Min (ms)</th>
+        <th>Moyenne (ms)</th>
+        <th>p95 (ms)</th>
+        <th>Max (ms)</th>
+        <th>Total (ms)</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (view of resultViews(); track view.key) {
+        <tr [class.running]="view.running">
+          <td>{{ view.label }}</td>
+          <td>{{ view.heroes }}</td>
+          <td>{{ view.powers }}</td>
+          <td>{{ view.samples }}</td>
+          @if (view.stats; as stats) {
+            <td>{{ stats.min | number: '1.1-1' }}</td>
+            <td>{{ stats.avg | number: '1.1-1' }}</td>
+            <td>{{ stats.p95 | number: '1.1-1' }}</td>
+            <td>{{ stats.max | number: '1.1-1' }}</td>
+            <td>{{ view.totalMs | number: '1.0-0' }}</td>
+            <td class="ok">OK</td>
+          } @else {
+            <td colspan="9">
+              @if (view.error) {
+                <span class="error">{{ view.error }}</span>
+              } @else if (view.running) {
+                <span class="status">en cours…</span>
+              } @else {
+                <span class="status">—</span>
+              }
+            </td>
+            <td></td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

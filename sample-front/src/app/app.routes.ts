@@ -19,9 +19,20 @@ export const routes: Routes = [
     loadComponent: () => import('./features/hero-detail/hero-detail.component').then(m => m.HeroDetailComponent),
   },
   {
+    path: 'seed',
+    loadComponent: () => import('./features/seed/seed.component').then(m => m.SeedComponent),
+  },
+  {
     path: 'benchmark',
     loadComponent: () =>
       import('./features/benchmark/benchmark.component').then(m => m.BenchmarkComponent),
+  },
+  {
+    path: 'benchmark/seed',
+    loadComponent: () =>
+      import('./features/seed-benchmark/seed-benchmark.component').then(
+        m => m.SeedBenchmarkComponent,
+      ),
   },
   {
     path: 'powers/new',

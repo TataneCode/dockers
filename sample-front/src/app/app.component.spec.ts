@@ -26,6 +26,13 @@ describe('AppComponent', () => {
       fixture.nativeElement.querySelectorAll('a')
     ).map((link: HTMLAnchorElement) => link.textContent?.trim());
 
-    expect(links).toEqual(['🦸 Heroes & Powers', 'Heroes', '+ Power', 'Benchmark']);
+    expect(links).toEqual([
+      '🦸 Heroes & Powers',
+      'Heroes',
+      '+ Power',
+      'Benchmark',
+      'Benchmark seed',
+      'Seed',
+    ]);
   });
 });
