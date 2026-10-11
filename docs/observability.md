@@ -73,6 +73,43 @@ Grafana ≥ 10.4 — aucune métrique Prometheus n'est requise côté applicatio
 2. **p95 des requêtes HTTP** (`quantile_over_time(0.95, duration)`)
 3. **Débit req/s** (`rate()`)
 4. **Traces récentes** par backend (nest-api, sample-api, rust-api) — cliquer une trace ouvre le flame graph
+
+## Dashboard provisionné : « API Runtime — Mémoire & CPU des backends »
+
+Provisionné automatiquement au démarrage depuis `docker/grafana/api-runtime.json`.
+
+Chaque backend exporte désormais des **métriques de processus/runtime** via OTLP
+(exportées toutes les 10 s vers le Prometheus interne d'otel-lgtm) :
+
+| Métrique | nest-api | rust-api | sample-api |
+|----------|----------|----------|------------|
+| Mémoire résidente (RSS) | `process.memory.usage` (host-metrics) | `process.memory.usage` (lecture `/proc`) | `process.memory.usage` (Instrumentation.Process) |
+| Mémoire virtuelle | `process.memory.virtual` | `process.memory.virtual` | `process.memory.virtual` |
+| CPU (temps cumulé) | `process.cpu.time` | `process.cpu.time` | `process.cpu.time` |
+| CPU (utilisation) | `process.cpu.utilization` | `process.cpu.utilization` | `process.cpu.utilization` |
+| Uptime | `process.uptime` | `process.uptime` | `process.uptime` |
+| Runtime-spécifique | event loop delay, heap Node (`instrumentation-runtime-node`) | — | heap GC, threadpool (`Instrumentation.Runtime`) |
+
+Panneaux : RSS comparé des 3 backends, heap .NET, heap/event loop Node,
+CPU temps et utilisation, threads & uptime.
+
+> ⚠️ Les chiffres sont comparables entre backends **en mode release** uniquement.
+> En dev, `dotnet watch` (SDK complet + JIT) et le hot reload Node gonflent
+> artificiellement la mémoire et le CPU. Pour un comparatif honnête, utiliser
+> `docker-compose.yml` (profil release).
+
+### Tailles d'images Docker — repères dev vs prod
+
+| Stack | Image dev (approx.) | Image prod attendue (approx.) |
+|-------|--------------------|-------------------------------|
+| RustApi | ~1,5–2 Go (toolchain `rust:1.87-slim` multi-stage) | ~30–80 Mo (binaire sur `bookworm-slim`, réductible vers distroless) |
+| NestApi | ~1–1,5 Go (`node:22` + node_modules dev) | ~250–400 Mo (`node:22-slim` + deps prod) |
+| SampleApi (.NET) | ~1,5–2 Go (`almalinux:9` + SDK .NET 10) | ~120–230 Mo (`mcr.microsoft.com/dotnet/aspnet:10.0`) |
+
+La toolchain Rust est la plus lourde **au build** mais produit le runtime **le plus léger** ;
+le dev .NET est lourd (SDK complet) mais compile instantanément. Ces tailles sont des
+repères — mesurer réellement avec `docker compose build && docker images` après tout
+changement de Dockerfile.
    des spans, et le lien **Logs** sur un span saute aux logs Loki corrélés
 
 Pour le retrouver : menu **Dashboards** → *Heroes & Powers — API Benchmark*.

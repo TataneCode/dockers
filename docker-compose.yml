@@ -43,6 +43,7 @@ services:
       - otel-lgtm-data:/otel-lgtm
       - ./docker/grafana/dashboards-provider.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/custom.yaml:ro
       - ./docker/grafana/heroes-powers-benchmark.json:/otel-lgtm/grafana/conf/provisioning/dashboards/custom/heroes-powers-benchmark.json:ro
+      - ./docker/grafana/api-runtime.json:/otel-lgtm/grafana/conf/provisioning/dashboards/custom/api-runtime.json:ro
     networks:
       - app
 

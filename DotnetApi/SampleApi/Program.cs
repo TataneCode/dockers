@@ -4,6 +4,7 @@ using SampleApi.Middleware;
 using SampleApi.Infrastructure;
 using Scalar.AspNetCore;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -21,6 +22,11 @@ builder.Services.AddOpenTelemetry()
         .AddHttpClientInstrumentation()
         .AddOtlpExporter(o => o.Endpoint = new Uri(otlpEndpoint)))
     .WithLogging(l => l
+        .AddOtlpExporter(o => o.Endpoint = new Uri(otlpEndpoint)))
+    .WithMetrics(m => m
+        .AddProcessInstrumentation()
+        .AddRuntimeInstrumentation()
+        .AddAspNetCoreInstrumentation()
         .AddOtlpExporter(o => o.Endpoint = new Uri(otlpEndpoint)));
 
 builder.Services.AddOpenApi();
